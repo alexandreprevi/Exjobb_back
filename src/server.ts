@@ -10,6 +10,7 @@ import { Dependencies } from './types/app.types'
 import { Controllers } from './controllers'
 import { RouteHandler } from './router'
 import { errorMiddleware } from './middlewares/error.middleware'
+import { authMiddleware } from './middlewares/auth.middleware'
 
 
 export const CreateServer = (deps: Dependencies) => {
@@ -20,6 +21,8 @@ export const CreateServer = (deps: Dependencies) => {
 
 
     const setupMiddleware = () => {
+        app.use(authMiddleware)
+
         if (process.env.NODE_ENV === 'production') {
             app.use(morgan('combined', { stream }))
             app.use(cors({ origin: 'mydomain.com', credentials: true }))

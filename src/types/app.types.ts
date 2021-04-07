@@ -1,9 +1,11 @@
 import { Logger } from 'winston'
 import { Controllers } from '../controllers'
+import { AliveService } from '../services/aliveService'
 
 export interface Dependencies {
     logger: Logger
     db: any
+    aliveService: AliveService // There are the typings, not the whole service
 }
 
 export interface RouterDeps {

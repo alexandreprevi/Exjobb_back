@@ -3,6 +3,7 @@ import { Controllers } from '../controllers'
 
 export interface Dependencies {
     logger: Logger
+    db: any
 }
 
 export interface RouterDeps {

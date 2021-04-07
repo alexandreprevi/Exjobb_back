@@ -69,6 +69,8 @@ export const UserService = ({ db, auth }): UserService => {
     }
     const updateUserInFirestore = async (uid: string, userChanges: UpdateUserPayload) => {
         try {
+            logger.info('entering service!!!!')
+            logger.info(uid)
             const result = await db.collection('users').doc(uid).update(userChanges)
             return Promise.resolve({ success: true, data: result })
         } catch (error) {

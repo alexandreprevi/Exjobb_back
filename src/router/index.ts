@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction, request, response } from 'expr
 import { RouterDeps } from '../types/app.types'
 import { sendOk200Response, sendNotOk200Response, sendNotOk503Response, sendNotOk404Response } from './responses'
 import { dtoValidationMiddleware } from '../middlewares/dtoValidation.middleware'
-import { createUserSchema } from '../utils/dtoValidationSchemas'
+import { createUserSchema, updateUserSchema } from '../utils/dtoValidationSchemas'
 
 export const RouteHandler = (deps: RouterDeps): Router => {
     const { logger, controllers } = deps
@@ -91,9 +91,9 @@ export const RouteHandler = (deps: RouterDeps): Router => {
         }
     })
 
-    router.put('/user', dtoValidationMiddleware(createUserSchema), async (req: Request, res: Response, next: NextFunction) => {
+    router.put('/user', dtoValidationMiddleware(updateUserSchema), async (req: Request, res: Response, next: NextFunction) => {
         try {
-            const uid = '' // GET uid from req['uid'] when decoding idToken
+            const uid = req['uid']
             const user = req.body
             const { success, data } = await controllers.userController.updateUser(uid, user)
             if (success) {

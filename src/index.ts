@@ -8,6 +8,7 @@ import { validateEnv } from './utils/validateEnv'
 import { AliveService } from './services/aliveService'
 import { UserService } from './services/userService'
 import { CreateServer } from './server'
+import { AdminSdkService } from './services/adminSdkService'
 
 validateEnv()
 
@@ -23,8 +24,9 @@ const main = async () => {
     const { auth } = AUTH(firebase)
     const aliveService = AliveService({ db })
     const userService = UserService({ db, auth })
-    
-    const deps: Dependencies = { logger, db, auth, aliveService, userService }
+    const adminSdkService = AdminSdkService({ auth })
+
+    const deps: Dependencies = { logger, db, auth, aliveService, userService, adminSdkService }
 
     const server = CreateServer(deps)
     server.start()

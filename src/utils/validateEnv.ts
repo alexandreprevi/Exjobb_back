@@ -5,5 +5,6 @@ export const validateEnv = () => {
         NODE_ENV: str(),
         PORT: port(),
         SERVICE_ACCOUNT: str(),
+        FIREBASE_WEB_API_KEY: str(),
     })
 }

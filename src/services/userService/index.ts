@@ -1,20 +1,16 @@
-import { addSyntheticLeadingComment } from 'typescript'
-import firebase from 'firebase-admin'
 import { logger } from '../../utils/logger'
-import { UserResponse, ServiceError, User, UserRecord, createUserAuthDb, UserRecordResponse, createUserFirestore } from './userService.types'
+import { UserResponse, ServiceError } from './userService.types'
 
 export interface UserService {
     getUserByEmail: (email: string) => Promise<UserResponse | ServiceError>
     getUserById: (id: string) => Promise<UserResponse | ServiceError>
-    createUserInAuthDb: (newUserAuthDb: createUserAuthDb) => Promise<UserRecordResponse | ServiceError>
-    createUserInFirestore: (newUserFirestore: createUserFirestore) => Promise<UserResponse | ServiceError>
 }
 
 // NOTE: This is just for testing / example
 // The GET operations for users should probably be done
 // directly from the client instead
 
-export const UserService = ({ db, auth }): UserService => {
+export const UserService = ({ db }): UserService => {
     const getUserByEmail = async (email: string) => {
         try {
             const result = await db.collection('users').where('email', '==', email.toLowerCase()).get()
@@ -23,7 +19,7 @@ export const UserService = ({ db, auth }): UserService => {
             })
             return Promise.resolve({ success: true, data })
         } catch (error) {
-            return Promise.resolve({ success: false, data: 'COULD NOT GET USER BY EMAIL' })
+            return Promise.resolve({ success: false, data: 'SYSTEM_ERROR' })
         }
     }
     const getUserById = async (id: string) => {
@@ -32,32 +28,9 @@ export const UserService = ({ db, auth }): UserService => {
             const data = result.data()
             return Promise.resolve({ success: true, data })
         } catch (error) {
-            return Promise.resolve({ success: false, data: 'COULD NOT GET USER BY ID' })
-        }
-    }
-    const createUserInAuthDb = async (newUserAuthDb: createUserAuthDb) => {
-        try {
-            const userRecord = await auth.createUser(newUserAuthDb)
-            return Promise.resolve({ success: true, data: userRecord })
-        } catch (error) {
-            return Promise.resolve({ success: false, data: 'COULD NOT CREATE USER IN AUTH DB' })
-        }
-    }
-    const createUserInFirestore = async (newUserFirestore: createUserFirestore) => {
-        try {
-            const user = {
-                firstName: newUserFirestore.firstName,
-                lastName: newUserFirestore.lastName,
-                displayName: newUserFirestore.displayName,
-                email: newUserFirestore.email,
-                created: firebase.firestore.FieldValue.serverTimestamp(),
-            }
-            const result = await db.collection('users').doc(newUserFirestore.uid).set(user)
-            return Promise.resolve({ success: true, data: result })
-        } catch (error) {
-            return Promise.resolve({ success: false, data: 'COULD NOT CREATE USER IN FIRESTORE' })
+            return Promise.resolve({ success: false, data: 'SYSTEM_ERROR' })
         }
     }
 
-    return { getUserByEmail, getUserById, createUserInAuthDb, createUserInFirestore }
+    return { getUserByEmail, getUserById }
 }

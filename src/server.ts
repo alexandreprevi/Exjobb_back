@@ -9,6 +9,7 @@ import { stream } from './utils/logger'
 import { Dependencies } from './types/app.types'
 import { Controllers } from './controllers'
 import { RouteHandler } from './router'
+import { errorMiddleware } from './middlewares/error.middleware'
 
 
 export const CreateServer = (deps: Dependencies) => {
@@ -44,6 +45,7 @@ export const CreateServer = (deps: Dependencies) => {
     setupMiddleware()
 
     app.use(router)
+    app.use(errorMiddleware)
 
     return { start }
 }

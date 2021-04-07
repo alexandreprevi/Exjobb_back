@@ -1,4 +1,4 @@
-import { Router, Request, Response, NextFunction } from 'express'
+import { Router, Request, Response, NextFunction, request, response } from 'express'
 import { RouterDeps } from '../types/app.types'
 import { sendOk200Response, sendNotOk200Response, sendNotOk503Response, sendNotOk404Response } from './responses'
 
@@ -22,6 +22,35 @@ export const RouteHandler = (deps: RouterDeps): Router => {
     router.get('/alive', async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { success, data } = await controllers.aliveController.isAlive()
+            if (success) {
+                sendOk200Response(req, res, data)
+            } else {
+                sendNotOk503Response(req, res, data)
+            }
+        } catch (error) {
+            next(error)
+        }
+    })
+
+    // User
+    router.get('/user/email/:email', async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { email } = req.params
+            const { success, data } = await controllers.userController.getUserByEmail(email)
+            if (success) {
+                sendOk200Response(req, res, data)
+            } else {
+                sendNotOk503Response(req, res, data)
+            }
+        } catch (error) {
+            next(error)
+        }
+    })
+
+    router.get('/user/id/:id', async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { id } = req.params
+            const { success, data } = await controllers.userController.getUserById(id)
             if (success) {
                 sendOk200Response(req, res, data)
             } else {

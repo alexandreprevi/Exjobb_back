@@ -16,6 +16,13 @@ export type User = {
     password: string
 }
 
+export type UpdateUserPayload = {
+    firstName?: string
+    lastName?: string
+    displayName?: string
+    email?: string
+}
+
 export type createUserAuthDb = {
     email: string
     password: string

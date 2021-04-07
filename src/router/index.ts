@@ -93,8 +93,9 @@ export const RouteHandler = (deps: RouterDeps): Router => {
 
     router.put('/user', dtoValidationMiddleware(createUserSchema), async (req: Request, res: Response, next: NextFunction) => {
         try {
+            const uid = '' // GET uid from req['uid'] when decoding idToken
             const user = req.body
-            const { success, data } = await controllers.userController.createUser(user)
+            const { success, data } = await controllers.userController.updateUser(uid, user)
             if (success) {
                 sendOk200Response(req, res, data)
             } else {

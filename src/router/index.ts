@@ -35,6 +35,20 @@ export const RouteHandler = (deps: RouterDeps): Router => {
     })
 
     // User
+    router.post('/getidtoken', async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { uid } = req.body
+            const { success, data } = await controllers.adminSdkController.getFirebaseIdToken(uid)
+            if (success) {
+                sendOk200Response(req, res, data)
+            } else {
+                sendNotOk503Response(req, res, data)
+            }
+        } catch (error) {
+            next(error)
+        }
+    })
+
     router.get('/user/email/:email', async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { email } = req.params
@@ -64,6 +78,20 @@ export const RouteHandler = (deps: RouterDeps): Router => {
     })
 
     router.post('/createuser', dtoValidationMiddleware(createUserSchema), async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const user = req.body
+            const { success, data } = await controllers.userController.createUser(user)
+            if (success) {
+                sendOk200Response(req, res, data)
+            } else {
+                sendNotOk503Response(req, res, data)
+            }
+        } catch (error) {
+            next(error)
+        }
+    })
+
+    router.put('/user', dtoValidationMiddleware(createUserSchema), async (req: Request, res: Response, next: NextFunction) => {
         try {
             const user = req.body
             const { success, data } = await controllers.userController.createUser(user)

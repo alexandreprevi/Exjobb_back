@@ -1,8 +1,9 @@
+import firebase from 'firebase-admin'
 import { NextFunction, Request, Response } from 'express'
 import { logger } from '../utils/logger'
 import { sendNotOk401Response } from '../router/responses'
 
-export const authMiddleware = (req: Request, res: Response, next: NextFunction) => {
+export const authMiddleware = async (req: Request, res: Response, next: NextFunction) => {
     try {
         // Apply authentication by default on all routes.
         // We can add exceptions manually here.
@@ -11,14 +12,27 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
         if (nonAuthRoutes.indexOf(req.path) > - 1) {
             next()
         } else {
-            const authHeader = req.headers.authorization
-            if(authHeader?.length > 0) {
-                // We expect a Bearer XXXXX type token
-                const [, token] = authHeader.split(' ')
-                // TODO: Here we should in the future perform a jwt authentication with 'token'
-                // loog in firebase admin sdk methods
-                next()
+            if (!req.headers.authorization) {
+                sendNotOk401Response(req, res, 'Not authenticated.')
+            }
+            // Get auth token
+            let idToken: string
+            if (req.headers.authorization && req.headers.authorization.startsWith('Bearer ')) {
+                // Read token
+                idToken = req.headers.authorization.split('Bearer ')[1]
+                logger.info('Authorization header Found')
             } else {
+                idToken = null
+            }
+
+            // Check token
+            try {
+                const decodedToken = await firebase.auth().verifyIdToken(idToken)
+                // Extract uid and email
+                req['uid'] = decodedToken.uid
+                req['userEmail'] = decodedToken.email
+                return next()
+            } catch (error) {
                 sendNotOk401Response(req, res, 'Not authenticated.')
             }
         }

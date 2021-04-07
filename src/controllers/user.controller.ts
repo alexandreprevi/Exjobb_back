@@ -1,4 +1,4 @@
-import { User } from '../services/userService/userService.types'
+import { User, UpdateUserPayload } from '../services/userService/userService.types'
 import { Dependencies, ControllerResult } from '../types/app.types'
 import { logger } from '../utils/logger'
 import { failedResult, successResult } from './controllerResults'
@@ -7,6 +7,7 @@ export interface UserController {
     getUserByEmail: (email: string) => Promise<ControllerResult>
     getUserById: (id: string) => Promise<ControllerResult>
     createUser: (user: User) => Promise<ControllerResult>
+    updateUser: (uid: string, userChanges: UpdateUserPayload) => Promise<ControllerResult>
 }
 
 export const UserController = (deps: Dependencies): UserController => {
@@ -68,6 +69,28 @@ export const UserController = (deps: Dependencies): UserController => {
             throw new Error(error)
         }
     }
+    const updateUser = async (uid: string, userChanges: UpdateUserPayload) => {
+        try {
+            // Get uid from req['uid]
+            // Check if user changed email or displayName
+            if (userChanges.displayName || userChanges.email) {
+                // update user object in Auth DB
+                const { success, data } = await deps.userService.updateUserInAuthDb(uid, userChanges)
+                if (!success) {
+                    return failedResult(data)
+                }
+            }
+            // update user in Firestore
+            const { success, data } = await deps.userService.updateUserInFirestore(uid, userChanges)
+            if (success) {
+                return successResult(data)
+            } else {
+                return failedResult(data)
+            }
+        } catch (error) {
+            throw new Error(error)
+        }
+    }
 
-    return { getUserByEmail, getUserById, createUser }
+    return { getUserByEmail, getUserById, createUser, updateUser, }
 }

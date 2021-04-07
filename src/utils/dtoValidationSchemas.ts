@@ -7,7 +7,7 @@ export const createUserSchema = Joi.object({
     password: Joi.string().required()
 })
 
-export const updateUSerSchema = Joi.object({
+export const updateUserSchema = Joi.object({
     firstName: Joi.string().trim(),
     lastName: Joi.string().trim(),
     displayName: Joi.string().trim(),

@@ -71,7 +71,6 @@ export const UserController = (deps: Dependencies): UserController => {
     }
     const updateUser = async (uid: string, userChanges: UpdateUserPayload) => {
         try {
-            // Get uid from req['uid]
             // Check if user changed email or displayName
             if (userChanges.displayName || userChanges.email) {
                 // update user object in Auth DB

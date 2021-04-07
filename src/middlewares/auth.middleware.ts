@@ -7,7 +7,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
         // Apply authentication by default on all routes.
         // We can add exceptions manually here.
         // We'll allow non-authenticated checking whether the service is alive.
-        const nonAuthRoutes = ['/alive', '/createuser']
+        const nonAuthRoutes = ['/alive']
         if (nonAuthRoutes.indexOf(req.path) > - 1) {
             next()
         } else {

@@ -6,6 +6,7 @@ import { UserService } from '../services/userService'
 export interface Dependencies {
     logger: Logger
     db: any
+    auth: any
     aliveService: AliveService // There are the typings, not the whole service
     userService: UserService
 }

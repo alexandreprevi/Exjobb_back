@@ -5,3 +5,9 @@ export const DB = firebase => {
     const db = firebase.firestore()
     return { db }
 }
+
+export const AUTH = firebase => {
+    logger.info(`Initializing Firebase Auth...`)
+    const auth = firebase.auth()
+    return { auth }
+}

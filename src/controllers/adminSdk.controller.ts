@@ -8,6 +8,7 @@ export interface AdminSdkController {
     getFirebaseIdToken: (uid: string) => Promise<ControllerResult>
     getUserRecord: (uid: string) => Promise<ControllerResult>
     updateUser: (uid: string, changes: UpdateUserWithAdminSdk) => Promise<ControllerResult>
+    deleteUser: (uid: string) => Promise<ControllerResult>
 }
 
 export const AdminSdkController = (deps: Dependencies): AdminSdkController => {
@@ -48,13 +49,29 @@ export const AdminSdkController = (deps: Dependencies): AdminSdkController => {
                 return failedResult(data)
             } else {
                 if (changes.photoURL || changes.email || changes.displayName) {
-                    const filteredUserForFirestore = prepareUserObjectForFirestore(changes) 
+                    const filteredUserForFirestore = prepareUserObjectForFirestore(changes)
                     const { success, data } = await deps.userService.updateUserInFirestore(uid, filteredUserForFirestore)
-                    if (success) {
-                        return successResult(data)
-                    } else {
+                    if (!success) {
                         return failedResult(data)
                     }
+                }
+                return successResult(data)
+            }
+        } catch (error) {
+            throw new Error(error)
+        }
+    }
+    const deleteUser = async (uid: string) => {
+        try {
+            const { success, data } = await deps.userService.deleteUserInAuthDb(uid)
+            if (!success) {
+                return failedResult(data)
+            } else {
+                const { success, data } = await deps.userService.deleteUserInFirestore(uid)
+                if (success) {
+                    return successResult(data)
+                } else {
+                    return failedResult(data)
                 }
             }
         } catch (error) {
@@ -62,5 +79,5 @@ export const AdminSdkController = (deps: Dependencies): AdminSdkController => {
         }
     }
 
-    return { getFirebaseIdToken, getUserRecord, updateUser }
+    return { getFirebaseIdToken, getUserRecord, updateUser, deleteUser }
 }

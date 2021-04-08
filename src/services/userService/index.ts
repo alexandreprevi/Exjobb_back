@@ -9,6 +9,8 @@ export interface UserService {
     createUserInFirestore: (newUserFirestore: createUserFirestore) => Promise<UserResponse | ServiceError>
     updateUserInAuthDb: (uid: string, userChanges: UpdateUserPayload) => Promise<UserResponse | ServiceError>
     updateUserInFirestore: (uid: string, userChanges: UpdateUserPayload) => Promise<UserResponse | ServiceError>
+    deleteUserInAuthDb: (uid: string) => Promise<UserResponse | ServiceError>
+    deleteUserInFirestore: (uid: string) => Promise<UserResponse | ServiceError>
 }
 
 // NOTE: This is just for testing / example
@@ -79,6 +81,22 @@ export const UserService = ({ db, auth }): UserService => {
             return Promise.resolve({ success: false, data: 'COULD NOT UPDATE USER IN FIRESTORE' })
         }
     }
+    const deleteUserInAuthDb = async (uid: string) => {
+        try {
+            const result = await auth.deleteUser(uid)
+            return Promise.resolve({ success: true, data: result })
+        } catch (error) {
+            return Promise.resolve({ success: false, data: 'COULD NOT DELETE USER IN AUTH DB' })
+        }
+    }
+    const deleteUserInFirestore = async (uid: string) => {
+        try {
+            const result = await db.collection('users').doc(uid).delete()
+            return Promise.resolve({ success: true, data: result })
+        } catch (error) {
+            return Promise.resolve({ success: false, data: 'COULD NOT DELETE USER IN FIRESTORE' })
+        }
+    }
 
-    return { getUserByEmail, getUserById, createUserInAuthDb, createUserInFirestore, updateUserInAuthDb, updateUserInFirestore }
+    return { getUserByEmail, getUserById, createUserInAuthDb, createUserInFirestore, updateUserInAuthDb, updateUserInFirestore, deleteUserInAuthDb, deleteUserInFirestore }
 }

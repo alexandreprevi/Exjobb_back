@@ -1,6 +1,6 @@
 import axios from 'axios'
 import { logger } from "../../utils/logger";
-import { UpdateUserWithAdminSdk, UserRecordResponse } from '../userService/userService.types';
+import { UpdateUserWithAdminSdk, UserDeletedResponse, UserRecordResponse } from '../userService/userService.types';
 import { CustomIdTokenResponse, FirebaseIdTokenResponse, ServiceError } from "./adminSdkService.types";
 
 export interface AdminSdkService {
@@ -43,7 +43,7 @@ export const AdminSdkService = ({ auth }): AdminSdkService => {
             const result = await auth.updateUser(uid, changes)
             return Promise.resolve({ success: true, data: result })
         } catch (error) {
-            return Promise.resolve({ success: false, data: 'COULD NOT GET UPDATE USER IN AUTH DB' })
+            return Promise.resolve({ success: false, data: 'COULD NOT UPDATE USER IN AUTH DB' })
         }
     }
 

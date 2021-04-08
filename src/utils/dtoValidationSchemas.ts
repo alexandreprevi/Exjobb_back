@@ -27,6 +27,10 @@ export const updateUserSchemaWithAsminSdk = Joi.object({
     }).required()
 })
 
+export const deleteUserSchemaWithAdminSdk = Joi.object({
+    uid: Joi.string().trim().required()
+})
+
 export const getUserByIdWithAdminSdk = Joi.object({
     uid: Joi.string().trim().required()
 })

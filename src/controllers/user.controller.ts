@@ -75,7 +75,6 @@ export const UserController = (deps: Dependencies): UserController => {
             // Check if user changed email, displayName or photoURL
             if (userChanges.displayName || userChanges.email || userChanges.photoURL) {
                 // update user object in Auth DB
-                logger.info('entering user DB')
                 const filteredUserForAuthDb = prepareUserObjectForAuthDb(userChanges)
                 const { success, data } = await deps.userService.updateUserInAuthDb(uid, filteredUserForAuthDb)
                 if (!success) {

@@ -13,7 +13,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
             next()
         } else {
             if (!req.headers.authorization) {
-                sendNotOk401Response(req, res, 'Not authenticated.')
+                return sendNotOk401Response(req, res, 'Not authenticated.')
             }
             // Get auth token
             let idToken: string
@@ -29,6 +29,10 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
             if (idToken) {
                 try {
                     const decodedToken = await firebase.auth().verifyIdToken(idToken)
+                    // Check if user email is verified
+                    if (!decodedToken.email_verified) {
+                        return sendNotOk401Response(req, res, 'Your account is pending. Please verify your email!')
+                    }
                     // Extract uid and email
                     req['uid'] = decodedToken.uid
                     req['userEmail'] = decodedToken.email

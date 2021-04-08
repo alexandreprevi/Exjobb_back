@@ -1,12 +1,13 @@
 import axios from 'axios'
 import { logger } from "../../utils/logger";
-import { UserRecordResponse } from '../userService/userService.types';
+import { UpdateUserWithAdminSdk, UserRecordResponse } from '../userService/userService.types';
 import { CustomIdTokenResponse, FirebaseIdTokenResponse, ServiceError } from "./adminSdkService.types";
 
 export interface AdminSdkService {
     getCustomToken: (uid: string) => Promise<CustomIdTokenResponse | ServiceError>
     getFirebaseIdToken: (customToken: string) => Promise<FirebaseIdTokenResponse | ServiceError>
     getUserRecord: (uid: string) => Promise<UserRecordResponse | ServiceError>
+    updateUserInAuthDb: (uid: string, changes: UpdateUserWithAdminSdk) => Promise<UserRecordResponse | ServiceError>
 }
 
 export const AdminSdkService = ({ auth }): AdminSdkService => {
@@ -37,6 +38,14 @@ export const AdminSdkService = ({ auth }): AdminSdkService => {
             return Promise.resolve({ success: false, data: 'COULD NOT GET USER RECORD' })
         }
     }
+    const updateUserInAuthDb = async (uid: string, changes: UpdateUserWithAdminSdk) => {
+        try {
+            const result = await auth.updateUser(uid, changes)
+            return Promise.resolve({ success: true, data: result })
+        } catch (error) {
+            return Promise.resolve({ success: false, data: 'COULD NOT GET UPDATE USER IN AUTH DB' })
+        }
+    }
 
-    return { getCustomToken, getFirebaseIdToken, getUserRecord }
+    return { getCustomToken, getFirebaseIdToken, getUserRecord, updateUserInAuthDb }
 }

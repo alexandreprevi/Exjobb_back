@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction, request, response } from 'expr
 import { RouterDeps } from '../types/app.types'
 import { sendOk200Response, sendNotOk200Response, sendNotOk503Response, sendNotOk404Response } from './responses'
 import { dtoValidationMiddleware } from '../middlewares/dtoValidation.middleware'
-import { createUserSchema, updateUserSchema } from '../utils/dtoValidationSchemas'
+import { createUserSchema, updateUserSchema, updateUserSchemaWithAsminSdk, getUserByIdWithAdminSdk, getFirebaseIdTokenWithAdminSdk } from '../utils/dtoValidationSchemas'
 
 export const RouteHandler = (deps: RouterDeps): Router => {
     const { logger, controllers } = deps
@@ -35,7 +35,7 @@ export const RouteHandler = (deps: RouterDeps): Router => {
     })
 
     // Admin
-    router.post('/admin/getidtoken', async (req: Request, res: Response, next: NextFunction) => {
+    router.post('/admin/getidtoken', dtoValidationMiddleware(getFirebaseIdTokenWithAdminSdk), async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { uid } = req.body
             const { success, data } = await controllers.adminSdkController.getFirebaseIdToken(uid)
@@ -49,10 +49,24 @@ export const RouteHandler = (deps: RouterDeps): Router => {
         }
     })
 
-    router.get('/admin/user', async (req: Request, res: Response, next: NextFunction) => {
+    router.get('/admin/user', dtoValidationMiddleware(getUserByIdWithAdminSdk), async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { uid } = req.body
             const { success, data } = await controllers.adminSdkController.getUserRecord(uid)
+            if (success) {
+                sendOk200Response(req, res, data)
+            } else {
+                sendNotOk503Response(req, res, data)
+            }
+        } catch (error) {
+            next(error)
+        }
+    })
+
+    router.put('/admin/user', dtoValidationMiddleware(updateUserSchemaWithAsminSdk), async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { uid, changes } = req.body
+            const { success, data } = await controllers.adminSdkController.updateUser(uid, changes)
             if (success) {
                 sendOk200Response(req, res, data)
             } else {

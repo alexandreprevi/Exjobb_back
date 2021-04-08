@@ -9,6 +9,7 @@ export interface UserController {
     getUserById: (id: string) => Promise<ControllerResult>
     createUser: (user: User) => Promise<ControllerResult>
     updateUser: (uid: string, userChanges: UpdateUserPayload) => Promise<ControllerResult>
+    deleteUser: (uid: string) => Promise<ControllerResult>
 }
 
 export const UserController = (deps: Dependencies): UserController => {
@@ -93,6 +94,24 @@ export const UserController = (deps: Dependencies): UserController => {
             throw new Error(error)
         }
     }
+    const deleteUser = async (uid: string) => {
+        try {
+            logger.info('entering')
+            const { success, data } = await deps.userService.deleteUserInAuthDb(uid)
+            if (!success) {
+                return failedResult(data)
+            } else {
+                const { success, data } = await deps.userService.deleteUserInFirestore(uid)
+                if (success) {
+                    return successResult(data)
+                } else {
+                    return failedResult(data)
+                }
+            }
+        } catch (error) {
+            throw new Error(error)
+        }
+    }
 
-    return { getUserByEmail, getUserById, createUser, updateUser, }
+    return { getUserByEmail, getUserById, createUser, updateUser, deleteUser }
 }

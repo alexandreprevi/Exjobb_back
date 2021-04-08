@@ -8,6 +8,11 @@ export type UserRecordResponse = {
     data: UserRecord
 }
 
+export type UserDeletedResponse = {
+    success: boolean
+    data: null
+}
+
 export type User = {
     firstName: string
     lastName: string

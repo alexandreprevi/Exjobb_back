@@ -8,7 +8,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
         // Apply authentication by default on all routes.
         // We can add exceptions manually here.
         // We'll allow non-authenticated checking whether the service is alive.
-        const nonAuthRoutes = ['/alive', '/createuser', '/getidtoken']
+        const nonAuthRoutes = ['/alive', '/createuser', '/admin/getidtoken', '/admin/user']
         if (nonAuthRoutes.indexOf(req.path) > - 1) {
             next()
         } else {
@@ -26,14 +26,16 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
             }
 
             // Check token
-            try {
-                const decodedToken = await firebase.auth().verifyIdToken(idToken)
-                // Extract uid and email
-                req['uid'] = decodedToken.uid
-                req['userEmail'] = decodedToken.email
-                return next()
-            } catch (error) {
-                sendNotOk401Response(req, res, 'Not authenticated.')
+            if (idToken) {
+                try {
+                    const decodedToken = await firebase.auth().verifyIdToken(idToken)
+                    // Extract uid and email
+                    req['uid'] = decodedToken.uid
+                    req['userEmail'] = decodedToken.email
+                    return next()
+                } catch (error) {
+                    sendNotOk401Response(req, res, 'Not authenticated.')
+                }
             }
         }
     } catch (error) {

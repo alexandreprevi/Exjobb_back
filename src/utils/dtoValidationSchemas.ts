@@ -11,5 +11,6 @@ export const updateUserSchema = Joi.object({
     firstName: Joi.string().trim(),
     lastName: Joi.string().trim(),
     displayName: Joi.string().trim(),
+    photoURL: Joi.string().trim(),
     email: Joi.string(),
 })

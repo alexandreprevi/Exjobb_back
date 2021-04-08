@@ -34,8 +34,8 @@ export const RouteHandler = (deps: RouterDeps): Router => {
         }
     })
 
-    // User
-    router.post('/getidtoken', async (req: Request, res: Response, next: NextFunction) => {
+    // Admin
+    router.post('/admin/getidtoken', async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { uid } = req.body
             const { success, data } = await controllers.adminSdkController.getFirebaseIdToken(uid)
@@ -49,6 +49,21 @@ export const RouteHandler = (deps: RouterDeps): Router => {
         }
     })
 
+    router.get('/admin/user', async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { uid } = req.body
+            const { success, data } = await controllers.adminSdkController.getUserRecord(uid)
+            if (success) {
+                sendOk200Response(req, res, data)
+            } else {
+                sendNotOk503Response(req, res, data)
+            }
+        } catch (error) {
+            next(error)
+        }
+    })
+
+    // User
     router.get('/user/email/:email', async (req: Request, res: Response, next: NextFunction) => {
         try {
             const { email } = req.params

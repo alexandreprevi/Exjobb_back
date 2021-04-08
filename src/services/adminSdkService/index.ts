@@ -1,10 +1,12 @@
 import axios from 'axios'
 import { logger } from "../../utils/logger";
+import { UserRecordResponse } from '../userService/userService.types';
 import { CustomIdTokenResponse, FirebaseIdTokenResponse, ServiceError } from "./adminSdkService.types";
 
 export interface AdminSdkService {
     getCustomToken: (uid: string) => Promise<CustomIdTokenResponse | ServiceError>
     getFirebaseIdToken: (customToken: string) => Promise<FirebaseIdTokenResponse | ServiceError>
+    getUserRecord: (uid: string) => Promise<UserRecordResponse | ServiceError>
 }
 
 export const AdminSdkService = ({ auth }): AdminSdkService => {
@@ -27,6 +29,14 @@ export const AdminSdkService = ({ auth }): AdminSdkService => {
             return Promise.resolve({ success: false, data: 'COULD NOT GET A FIREBASE ID TOKEN' })
         }
     }
+    const getUserRecord = async (uid: string) => {
+        try {
+            const result = await auth.getUser(uid)
+            return Promise.resolve({ success: true, data: result })
+        } catch (error) {
+            return Promise.resolve({ success: false, data: 'COULD NOT GET USER RECORD' })
+        }
+    }
 
-    return { getCustomToken, getFirebaseIdToken }
+    return { getCustomToken, getFirebaseIdToken, getUserRecord }
 }

@@ -24,6 +24,15 @@ export type UpdateUserPayload = {
     photoURL?: string
 }
 
+export type UpdateUserWithAdminSdk = {
+    displayName?: string
+    email?: string
+    photoURL?: string
+    disabled?: boolean
+    emailVerified?: boolean
+    password?: string
+}
+
 export type UpdateUserInAuthDb = {
     email?: string
     displayName?: string

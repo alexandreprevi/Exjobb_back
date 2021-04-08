@@ -1,6 +1,7 @@
 import { User, UpdateUserPayload } from '../services/userService/userService.types'
 import { Dependencies, ControllerResult } from '../types/app.types'
 import { logger } from '../utils/logger'
+import { prepareUserObjectForAuthDb, prepareUserObjectForFirestore } from '../utils/utils'
 import { failedResult, successResult } from './controllerResults'
 
 export interface UserController {
@@ -71,16 +72,19 @@ export const UserController = (deps: Dependencies): UserController => {
     }
     const updateUser = async (uid: string, userChanges: UpdateUserPayload) => {
         try {
-            // Check if user changed email or displayName
-            if (userChanges.displayName || userChanges.email) {
+            // Check if user changed email, displayName or photoURL
+            if (userChanges.displayName || userChanges.email || userChanges.photoURL) {
                 // update user object in Auth DB
-                const { success, data } = await deps.userService.updateUserInAuthDb(uid, userChanges)
+                logger.info('entering user DB')
+                const filteredUserForAuthDb = prepareUserObjectForAuthDb(userChanges)
+                const { success, data } = await deps.userService.updateUserInAuthDb(uid, filteredUserForAuthDb)
                 if (!success) {
                     return failedResult(data)
                 }
             }
             // update user in Firestore
-            const { success, data } = await deps.userService.updateUserInFirestore(uid, userChanges)
+            const filteredUserForFirestore = prepareUserObjectForFirestore(userChanges)
+            const { success, data } = await deps.userService.updateUserInFirestore(uid, filteredUserForFirestore)
             if (success) {
                 return successResult(data)
             } else {

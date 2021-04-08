@@ -21,6 +21,21 @@ export type UpdateUserPayload = {
     lastName?: string
     displayName?: string
     email?: string
+    photoURL?: string
+}
+
+export type UpdateUserInAuthDb = {
+    email?: string
+    displayName?: string
+    photoURL?: string
+}
+
+export type UpdateUserInFirestore = {
+    email?: string
+    firstName?: string
+    lastName?: string
+    displayName?: string
+    photoURL?: string
 }
 
 export type createUserAuthDb = {
@@ -39,15 +54,26 @@ export type createUserFirestore = {
 
 export type UserRecord = {
     uid: string
-    displayName: string
     email: string
-    emailIsVerified: boolean
+    emailVerified: boolean
+    displayName: string
+    photoURL: string
+    disable: false
     metadata: {
         lastSignInTime: string | null,
         creationTime: string 
     },
     tokensValidAfterTime: string
-    providerDate: []
+    providerDate: [
+        {
+            uid: string
+            displayName: string
+            email: string
+            providerId: string
+            phoneNumber: string
+            photoURL: string
+        }
+    ]
 }
 
 export interface ServiceError {

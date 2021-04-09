@@ -3,12 +3,14 @@ import { UpdateUserWithAdminSdk } from '../services/userService/userService.type
 import { logger } from "../utils/logger";
 import { failedResult, successResult } from "./controllerResults";
 import { prepareUserObjectForFirestore } from "../utils/utils";
+import { CustomClaim } from "../services/adminSdkService/adminSdkService.types";
 
 export interface AdminSdkController {
     getFirebaseIdToken: (uid: string) => Promise<ControllerResult>
     getUserRecord: (uid: string) => Promise<ControllerResult>
     updateUser: (uid: string, changes: UpdateUserWithAdminSdk) => Promise<ControllerResult>
     deleteUser: (uid: string) => Promise<ControllerResult>
+    setCustomClaim: (uid: string, claim: CustomClaim) => Promise<ControllerResult>
 }
 
 export const AdminSdkController = (deps: Dependencies): AdminSdkController => {
@@ -78,6 +80,19 @@ export const AdminSdkController = (deps: Dependencies): AdminSdkController => {
             throw new Error(error)
         }
     }
+    const setCustomClaim = async (uid: string, claim: CustomClaim) => {
+        try {
+            const { success, data } = await deps.adminSdkService.setCustomClaim(uid, claim)
 
-    return { getFirebaseIdToken, getUserRecord, updateUser, deleteUser }
+            if (success) {
+                return successResult(data)
+            } else {
+                return failedResult(data)
+            }
+        } catch (error) {
+            throw new Error(error)
+        }
+    }
+
+    return { getFirebaseIdToken, getUserRecord, updateUser, deleteUser, setCustomClaim }
 }

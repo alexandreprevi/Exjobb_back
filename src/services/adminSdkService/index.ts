@@ -1,13 +1,14 @@
 import axios from 'axios'
 import { logger } from "../../utils/logger";
 import { UpdateUserWithAdminSdk, UserDeletedResponse, UserRecordResponse } from '../userService/userService.types';
-import { CustomIdTokenResponse, FirebaseIdTokenResponse, ServiceError } from "./adminSdkService.types";
+import { CustomClaim, CustomClaimResponse, CustomIdTokenResponse, FirebaseIdTokenResponse, ServiceError } from "./adminSdkService.types";
 
 export interface AdminSdkService {
     getCustomToken: (uid: string) => Promise<CustomIdTokenResponse | ServiceError>
     getFirebaseIdToken: (customToken: string) => Promise<FirebaseIdTokenResponse | ServiceError>
     getUserRecord: (uid: string) => Promise<UserRecordResponse | ServiceError>
     updateUserInAuthDb: (uid: string, changes: UpdateUserWithAdminSdk) => Promise<UserRecordResponse | ServiceError>
+    setCustomClaim: (uid: string, claim: CustomClaim) => Promise<CustomClaimResponse | ServiceError>
 }
 
 export const AdminSdkService = ({ auth }): AdminSdkService => {
@@ -46,6 +47,14 @@ export const AdminSdkService = ({ auth }): AdminSdkService => {
             return Promise.resolve({ success: false, data: 'COULD NOT UPDATE USER IN AUTH DB' })
         }
     }
+    const setCustomClaim = async (uid: string, claim: CustomClaim) => {
+        try {
+            const result = await auth.setCustomUserClaims(uid, { [claim.role]: claim.bool })
+            return Promise.resolve({ success: true, data: result })
+        } catch (error) {
+            return Promise.resolve({ success: false, data: 'COULD NOT SET CUSTOM CLAIM' })
+        }
+    }
 
-    return { getCustomToken, getFirebaseIdToken, getUserRecord, updateUserInAuthDb }
+    return { getCustomToken, getFirebaseIdToken, getUserRecord, updateUserInAuthDb, setCustomClaim }
 }

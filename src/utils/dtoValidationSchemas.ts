@@ -31,6 +31,14 @@ export const deleteUserSchemaWithAdminSdk = Joi.object({
     uid: Joi.string().trim().required()
 })
 
+export const setCustomClaimsSchema = Joi.object({
+    uid: Joi.string().trim().required(),
+    claim: Joi.object({
+        role: Joi.string().trim().required().valid('admin', 'developer'),
+        bool: Joi.bool().required(),
+    }).required(),
+})
+
 export const getUserByIdWithAdminSdk = Joi.object({
     uid: Joi.string().trim().required()
 })

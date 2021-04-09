@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction, request, response } from 'expr
 import { RouterDeps } from '../types/app.types'
 import { sendOk200Response, sendNotOk200Response, sendNotOk503Response, sendNotOk404Response } from './responses'
 import { dtoValidationMiddleware } from '../middlewares/dtoValidation.middleware'
-import { createUserSchema, updateUserSchema, updateUserSchemaWithAsminSdk, getUserByIdWithAdminSdk, getFirebaseIdTokenWithAdminSdk, deleteUserSchemaWithAdminSdk } from '../utils/dtoValidationSchemas'
+import { createUserSchema, updateUserSchema, updateUserSchemaWithAsminSdk, getUserByIdWithAdminSdk, getFirebaseIdTokenWithAdminSdk, deleteUserSchemaWithAdminSdk, setCustomClaimsSchema } from '../utils/dtoValidationSchemas'
 
 export const RouteHandler = (deps: RouterDeps): Router => {
     const { logger, controllers } = deps
@@ -81,6 +81,20 @@ export const RouteHandler = (deps: RouterDeps): Router => {
         try {
             const { uid } = req.body
             const { success, data } = await controllers.adminSdkController.deleteUser(uid)
+            if (success) {
+                sendOk200Response(req, res, data)
+            } else {
+                sendNotOk503Response(req, res, data)
+            }
+        } catch (error) {
+            next(error)
+        }
+    })
+
+    router.put('/admin/setcustomclaims', dtoValidationMiddleware(setCustomClaimsSchema), async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { uid, claim } = req.body
+            const { success, data } = await controllers.adminSdkController.setCustomClaim(uid, claim)
             if (success) {
                 sendOk200Response(req, res, data)
             } else {

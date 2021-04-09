@@ -8,6 +8,16 @@ export type CustomIdTokenResponse = {
     data: string
 }
 
+export type CustomClaim = {
+    role: string
+    bool: boolean
+}
+
+export type CustomClaimResponse = {
+    success: boolean
+    data: string
+}
+
 export type FirebaseIdTokenResponse = {
     success: boolean
     data: {

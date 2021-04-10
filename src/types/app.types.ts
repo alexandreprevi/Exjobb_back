@@ -2,6 +2,7 @@ import { Logger } from 'winston'
 import { Controllers } from '../controllers'
 import { AliveService } from '../services/aliveService'
 import { UserService } from '../services/userService'
+import { ProjectService } from '../services/projectService'
 import { AdminSdkService } from '../services/adminSdkService'
 
 export interface Dependencies {
@@ -10,6 +11,7 @@ export interface Dependencies {
     auth: any
     aliveService: AliveService // There are the typings, not the whole service
     userService: UserService
+    projectService: ProjectService
     adminSdkService: AdminSdkService
 }
 

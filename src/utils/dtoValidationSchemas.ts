@@ -1,5 +1,6 @@
 import Joi from 'joi'
 
+// User routes
 export const createUserSchema = Joi.object({
     firstName: Joi.string().trim().required(),
     lastName: Joi.string().trim().required(),
@@ -15,6 +16,34 @@ export const updateUserSchema = Joi.object({
     email: Joi.string().email().trim(),
 })
 
+// Project routes
+export const createProjectSchema = Joi.object({
+    title: Joi.string().trim().required(),
+    summary: Joi.string().trim().required(),
+    description: Joi.string().required(),
+    status: Joi.string().valid('public', 'private').required(),
+    coCreators: Joi.array().items(
+        Joi.string().trim(),
+    ),
+    participants: Joi.array().items(
+        Joi.string().trim(),
+    ),
+})
+
+export const updateProjectSchema = Joi.object({
+    title: Joi.string().trim(),
+    summary: Joi.string().trim(),
+    description: Joi.string(),
+    status: Joi.string().valid('public', 'private'),
+    coCreators: Joi.array().items(
+        Joi.string().trim(),
+    ),
+    participants: Joi.array().items(
+        Joi.string().trim(),
+    ),
+})
+
+// Admin routes
 export const updateUserSchemaWithAsminSdk = Joi.object({
     uid: Joi.string().trim().required(),
     changes: Joi.object({

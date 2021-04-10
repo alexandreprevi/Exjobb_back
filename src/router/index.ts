@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction, request, response } from 'expr
 import { RouterDeps } from '../types/app.types'
 import { sendOk200Response, sendNotOk200Response, sendNotOk503Response, sendNotOk404Response } from './responses'
 import { dtoValidationMiddleware } from '../middlewares/dtoValidation.middleware'
-import { createUserSchema, updateUserSchema, updateUserSchemaWithAsminSdk, getUserByIdWithAdminSdk, getFirebaseIdTokenWithAdminSdk, deleteUserSchemaWithAdminSdk, setCustomClaimsSchema, createProjectSchema } from '../utils/dtoValidationSchemas'
+import { createUserSchema, updateUserSchema, updateUserSchemaWithAsminSdk, getUserByIdWithAdminSdk, getFirebaseIdTokenWithAdminSdk, deleteUserSchemaWithAdminSdk, setCustomClaimsSchema, createProjectSchema, updateProjectSchema } from '../utils/dtoValidationSchemas'
 
 export const RouteHandler = (deps: RouterDeps): Router => {
     const { logger, controllers } = deps
@@ -194,34 +194,36 @@ export const RouteHandler = (deps: RouterDeps): Router => {
         }
     })
 
-    // router.put('/project/:projectId', dtoValidationMiddleware(updateProjectSchema), async (req: Request, res: Response, next: NextFunction) => {
-    //     try {
-    //         const uid = req['uid']
-    //         const project = req.body
-    //         const { success, data } = await controllers.projectController.updateProject(uid, project)
-    //         if (success) {
-    //             sendOk200Response(req, res, data)
-    //         } else {
-    //             sendNotOk503Response(req, res, data)
-    //         }
-    //     } catch (error) {
-    //         next(error)
-    //     }
-    // })
+    router.put('/project/:projectId', dtoValidationMiddleware(updateProjectSchema), async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const uid = req['uid']
+            const { projectId } = req.params
+            const changes = req.body
+            const { success, data } = await controllers.projectController.updateProject(uid, projectId, changes)
+            if (success) {
+                sendOk200Response(req, res, data)
+            } else {
+                sendNotOk503Response(req, res, data)
+            }
+        } catch (error) {
+            next(error)
+        }
+    })
 
-    // router.delete('/project/:projectId', async (req: Request, res: Response, next: NextFunction) => {
-    //     try {
-    //         const uid = req['uid']
-    //         const { success, data } = await controllers.projectController.deleteProject(projectId)
-    //         if (success) {
-    //             sendOk200Response(req, res, data)
-    //         } else {
-    //             sendNotOk503Response(req, res, data)
-    //         }
-    //     } catch (error) {
-    //         next(error)
-    //     }
-    // })
+    router.delete('/project/:projectId', async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const uid = req['uid']
+            const { projectId } = req.params
+            const { success, data } = await controllers.projectController.deleteProject(uid, projectId)
+            if (success) {
+                sendOk200Response(req, res, data)
+            } else {
+                sendNotOk503Response(req, res, data)
+            }
+        } catch (error) {
+            next(error)
+        }
+    })
 
 
     // 404

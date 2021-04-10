@@ -30,6 +30,19 @@ export const createProjectSchema = Joi.object({
     ),
 })
 
+export const updateProjectSchema = Joi.object({
+    title: Joi.string().trim(),
+    summary: Joi.string().trim(),
+    description: Joi.string(),
+    status: Joi.string().valid('public', 'private'),
+    coCreators: Joi.array().items(
+        Joi.string().trim(),
+    ),
+    participants: Joi.array().items(
+        Joi.string().trim(),
+    ),
+})
+
 // Admin routes
 export const updateUserSchemaWithAsminSdk = Joi.object({
     uid: Joi.string().trim().required(),

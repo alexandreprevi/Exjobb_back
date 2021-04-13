@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction, request, response } from 'expr
 import { RouterDeps } from '../types/app.types'
 import { sendOk200Response, sendNotOk200Response, sendNotOk503Response, sendNotOk404Response } from './responses'
 import { dtoValidationMiddleware } from '../middlewares/dtoValidation.middleware'
-import { createUserSchema, updateUserSchema, updateUserSchemaWithAsminSdk, getUserByIdWithAdminSdk, getFirebaseIdTokenWithAdminSdk, deleteUserSchemaWithAdminSdk, setCustomClaimsSchema, createProjectSchema, updateProjectSchema } from '../utils/dtoValidationSchemas'
+import { createUserSchema, updateUserSchema, updateUserSchemaWithAsminSdk, getUserByIdWithAdminSdk, getFirebaseIdTokenWithAdminSdk, deleteUserSchemaWithAdminSdk, setCustomClaimsSchema, createProjectSchema, updateProjectSchema, CommentSchema, ReactionSchema } from '../utils/dtoValidationSchemas'
 
 export const RouteHandler = (deps: RouterDeps): Router => {
     const { logger, controllers } = deps
@@ -225,6 +225,83 @@ export const RouteHandler = (deps: RouterDeps): Router => {
         }
     })
 
+    // Reactions
+    router.put('/project/:projectId/react', dtoValidationMiddleware(ReactionSchema), async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const uid = req['uid']
+            const { projectId } = req.params
+            const { reaction } = req.body
+            const { success, data } = await controllers.reactionController.reactToProject(uid, projectId, reaction)
+            if (success) {
+                sendOk200Response(req, res, data)
+            } else {
+                sendNotOk503Response(req, res, data)
+            }
+        } catch (error) {
+            next(error)
+        }
+    })
+    router.put('/project/:projectId/comment/:commentId/react', dtoValidationMiddleware(ReactionSchema), async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const uid = req['uid']
+            const { projectId, commentId } = req.params
+            const { reaction } = req.body
+            const { success, data } = await controllers.reactionController.reactToComment(uid, projectId, commentId, reaction)
+            if (success) {
+                sendOk200Response(req, res, data)
+            } else {
+                sendNotOk503Response(req, res, data)
+            }
+        } catch (error) {
+            next(error)
+        }
+    })
+
+    // Comments
+    router.post('/project/:projectId/comment', dtoValidationMiddleware(CommentSchema), async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const uid = req['uid']
+            const { projectId } = req.params
+            const comment = req.body
+            const { success, data } = await controllers.commentController.createComment(uid, projectId, comment)
+            if (success) {
+                sendOk200Response(req, res, data)
+            } else {
+                sendNotOk503Response(req, res, data)
+            }
+        } catch (error) {
+            next(error)
+        }
+    })
+
+    router.put('/project/:projectId/comment/:commentId', dtoValidationMiddleware(CommentSchema), async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { projectId, commentId } = req.params
+            const changes = req.body
+            const { success, data } = await controllers.commentController.updateComment(projectId, commentId, changes)
+            if (success) {
+                sendOk200Response(req, res, data)
+            } else {
+                sendNotOk503Response(req, res, data)
+            }
+        } catch (error) {
+            next(error)
+        }
+    })
+
+    router.delete('/project/:projectId/comment/:commentId', async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const { projectId, commentId } = req.params
+            const { success, data } = await controllers.commentController.deleteComment(projectId, commentId)
+            if (success) {
+                sendOk200Response(req, res, data)
+            } else {
+                sendNotOk503Response(req, res, data)
+            }
+        } catch (error) {
+            next(error)
+        }
+    })
 
     // 404
     router.all('*', (req, res) => {

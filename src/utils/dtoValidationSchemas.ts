@@ -20,6 +20,7 @@ export const updateUserSchema = Joi.object({
 export const createProjectSchema = Joi.object({
     title: Joi.string().trim().required(),
     summary: Joi.string().trim().required(),
+    category: Joi.string().trim().valid('frontend', 'backend', 'fullstack').required(),
     description: Joi.string().required(),
     status: Joi.string().valid('public', 'private').required(),
     coCreators: Joi.array().items(
@@ -33,6 +34,7 @@ export const createProjectSchema = Joi.object({
 export const updateProjectSchema = Joi.object({
     title: Joi.string().trim(),
     summary: Joi.string().trim(),
+    category: Joi.string().trim().valid('frontend', 'backend', 'fullstack'),
     description: Joi.string(),
     status: Joi.string().valid('public', 'private'),
     coCreators: Joi.array().items(
@@ -41,6 +43,19 @@ export const updateProjectSchema = Joi.object({
     participants: Joi.array().items(
         Joi.string().trim(),
     ),
+})
+
+// Comments routes
+export const CommentSchema = Joi.object({
+    content: Joi.string().trim().required(),
+})
+
+// Reactions routes
+export const ReactionSchema = Joi.object({
+    reaction: Joi.object({
+        name: Joi.string().valid('like', 'dislike', 'fire', 'rocket', 'laugh', 'confused', 'applause', 'angry').required(),
+        action: Joi.string().valid('add', 'remove').required()
+    }).required(),
 })
 
 // Admin routes

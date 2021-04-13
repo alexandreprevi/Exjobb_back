@@ -7,6 +7,7 @@ export interface ProjectService {
     createProject: (project: createProjectPayload) => Promise<ProjectResponse | ServiceError>
     updateProject: (projectId: string, projectChanges: updateProjectPayload) => Promise<ProjectResponse | ServiceError>
     deleteProject: (projectId: string) => Promise<ProjectResponse | ServiceError>
+    deleteImage: (projectId: string, image: string) => Promise<ProjectResponse | ServiceError>
     updateProjectHistory: (uid: string, projectId: string, action: string) => Promise<ProjectHistoryResponse | ServiceError>
 }
 
@@ -39,6 +40,16 @@ export const ProjectService = ({ db }): ProjectService => {
             return Promise.resolve({ success: false, data: 'COULD NOT DELETE PROJECT' })
         }
     }
+    const deleteImage = async (projectId: string, image: string) => {
+        try {
+            const result = await db.collection('projects').doc(projectId).update({
+                'images': firebase.firestore.FieldValue.arrayRemove(image)
+            })
+            return Promise.resolve({ success: true, data: result.id })
+        } catch (error) {
+            return Promise.resolve({ success: false, data: 'COULD NOT DELETE IMAGE FROM PROJECT' })
+        }
+    }
     const updateProjectHistory = async (uid: string, projectId: string, action: string) => {
         try {
             const result = await db.collection('projects').doc(projectId).collection('history').doc(generateIdWithTimestamp()).set({ event: { author: uid, action: action, timestamp: firebase.firestore.FieldValue.serverTimestamp() } }, { merge: true })
@@ -48,5 +59,5 @@ export const ProjectService = ({ db }): ProjectService => {
         }
     }
 
-    return { createProject, updateProject, deleteProject, updateProjectHistory }
+    return { createProject, updateProject, deleteProject, deleteImage, updateProjectHistory }
 }

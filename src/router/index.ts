@@ -2,7 +2,7 @@ import { Router, Request, Response, NextFunction, request, response } from 'expr
 import { RouterDeps } from '../types/app.types'
 import { sendOk200Response, sendNotOk200Response, sendNotOk503Response, sendNotOk404Response } from './responses'
 import { dtoValidationMiddleware } from '../middlewares/dtoValidation.middleware'
-import { createUserSchema, updateUserSchema, updateUserSchemaWithAsminSdk, getUserByIdWithAdminSdk, getFirebaseIdTokenWithAdminSdk, deleteUserSchemaWithAdminSdk, setCustomClaimsSchema, createProjectSchema, updateProjectSchema, CommentSchema, ReactionSchema } from '../utils/dtoValidationSchemas'
+import { createUserSchema, updateUserSchema, updateUserSchemaWithAsminSdk, getUserByIdWithAdminSdk, getFirebaseIdTokenWithAdminSdk, deleteUserSchemaWithAdminSdk, setCustomClaimsSchema, createProjectSchema, updateProjectSchema, deleteProjectImageSchema, CommentSchema, ReactionSchema } from '../utils/dtoValidationSchemas'
 import { sendUploadToGCS, upload } from '../middlewares/fileUpload.middleware'
 
 export const RouteHandler = (deps: RouterDeps): Router => {
@@ -196,12 +196,13 @@ export const RouteHandler = (deps: RouterDeps): Router => {
         }
     })
 
-    router.put('/project/:projectId', dtoValidationMiddleware(updateProjectSchema), async (req: Request, res: Response, next: NextFunction) => {
+    router.put('/project/:projectId', upload, sendUploadToGCS, dtoValidationMiddleware(updateProjectSchema), async (req: Request, res: Response, next: NextFunction) => {
         try {
             const uid = req['uid']
             const { projectId } = req.params
             const changes = req.body
-            const { success, data } = await controllers.projectController.updateProject(uid, projectId, changes)
+            const files = req.files
+            const { success, data } = await controllers.projectController.updateProject(uid, projectId, changes, files)
             if (success) {
                 sendOk200Response(req, res, data)
             } else {
@@ -217,6 +218,22 @@ export const RouteHandler = (deps: RouterDeps): Router => {
             const uid = req['uid']
             const { projectId } = req.params
             const { success, data } = await controllers.projectController.deleteProject(uid, projectId)
+            if (success) {
+                sendOk200Response(req, res, data)
+            } else {
+                sendNotOk503Response(req, res, data)
+            }
+        } catch (error) {
+            next(error)
+        }
+    })
+
+    router.delete('/project/:projectId/images', dtoValidationMiddleware(deleteProjectImageSchema), async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const uid = req['uid']
+            const { projectId } = req.params
+            const { image } = req.body
+            const { success, data } = await controllers.projectController.deleteProjectImage(uid, projectId, image)
             if (success) {
                 sendOk200Response(req, res, data)
             } else {

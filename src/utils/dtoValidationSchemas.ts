@@ -45,6 +45,10 @@ export const updateProjectSchema = Joi.object({
     ),
 })
 
+export const deleteProjectImageSchema = Joi.object({
+    image: Joi.string().trim(),
+})
+
 // Comments routes
 export const CommentSchema = Joi.object({
     content: Joi.string().trim().required(),

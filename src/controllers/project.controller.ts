@@ -5,7 +5,8 @@ import { failedResult, successResult } from './controllerResults'
 
 export interface ProjectController {
     createProject: (uid: string, project: createProjectPayload, files) => Promise<ControllerResult>
-    updateProject: (uid: string, projectId: string, ProjectChanges: updateProjectPayload) => Promise<ControllerResult>
+    updateProject: (uid: string, projectId: string, ProjectChanges: updateProjectPayload, files) => Promise<ControllerResult>
+    deleteProjectImage: (uid: string, projectId: string, image: string) => Promise<ControllerResult>
     deleteProject: (uid: string, projectId: string) => Promise<ControllerResult>
 }
 
@@ -74,7 +75,7 @@ export const ProjectController = (deps: Dependencies): ProjectController => {
             throw new Error(error)
         }
     }
-    const updateProject = async (uid: string, projectId: string, projectChanges: createProjectPayload) => {
+    const updateProject = async (uid: string, projectId: string, projectChanges: createProjectPayload, files) => {
         try {
             const { success, data } = await deps.projectService.updateProject(projectId, projectChanges)
             if (!success) {
@@ -85,6 +86,30 @@ export const ProjectController = (deps: Dependencies): ProjectController => {
                     return successResult(data)
                 } else {
                     return failedResult(data)
+                }
+            }
+        } catch (error) {
+            throw new Error(error)
+        }
+    }
+    const deleteProjectImage = async (uid: string, projectId: string, image: string) => {
+        try {
+            // DELETE from storage
+            const { success, data } = await deps.storageService.deleteImage(image)
+            if (!success) {
+                return failedResult(data)
+            } else {
+                // DELETE from project
+                const {success, data} = await deps.projectService.deleteImage(projectId, image)
+                if (!success) {
+                    return failedResult(data)
+                } else {
+                    const { success, data } = await deps.projectService.updateProjectHistory(uid, projectId, 'deleted images')
+                    if (success) {
+                        return successResult(data)
+                    } else {
+                        return failedResult(data)
+                    }
                 }
             }
         } catch (error) {
@@ -108,5 +133,5 @@ export const ProjectController = (deps: Dependencies): ProjectController => {
             throw new Error(error)
         }
     }
-    return { createProject, updateProject, deleteProject }
+    return { createProject, updateProject, deleteProjectImage, deleteProject }
 }

@@ -17,9 +17,41 @@ export type Project = {
     creator: string
     coCreators: string []
     participants?: Participant[]
-    ratingCount?: number
-    ratingTotalSum?: number
-    ratingAverage?: number
+    comments: number
+    reactions: {
+        likes: {
+            total: number
+            authors: string[]
+        }
+        dislikes: {
+            total: number
+            authors: string[]
+        }
+        fire: {
+            total: number
+            authors: string[]
+        }
+        rocket: {
+            total: number
+            authors: string[]
+        }
+        laugh: {
+            total: number
+            authors: string[]
+        }
+        confused: {
+            total: number
+            authors: string[]
+        }
+        applause: {
+            total: number
+            authors: string[]
+        }
+        angry: {
+            total: number
+            authors: string[]
+        }
+    }
 }
 
 export type createProjectPayload = {

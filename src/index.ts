@@ -8,6 +8,8 @@ import { validateEnv } from './utils/validateEnv'
 import { AliveService } from './services/aliveService'
 import { UserService } from './services/userService'
 import { ProjectService } from './services/projectService'
+import { CommentService } from './services/commentService'
+import { ReactionService } from './services/reactionService'
 import { CreateServer } from './server'
 import { AdminSdkService } from './services/adminSdkService'
 
@@ -26,9 +28,11 @@ const main = async () => {
     const aliveService = AliveService({ db })
     const userService = UserService({ db, auth })
     const projectService = ProjectService({ db })
+    const commentService = CommentService({ db })
+    const reactionService = ReactionService({ db })
     const adminSdkService = AdminSdkService({ auth })
 
-    const deps: Dependencies = { logger, db, auth, aliveService, userService, projectService, adminSdkService }
+    const deps: Dependencies = { logger, db, auth, aliveService, userService, projectService, commentService, reactionService, adminSdkService }
 
     const server = CreateServer(deps)
     server.start()

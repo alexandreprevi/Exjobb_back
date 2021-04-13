@@ -15,7 +15,41 @@ export const ProjectController = (deps: Dependencies): ProjectController => {
         try {
             const newProject = {
                 ...project,
-                creator: uid
+                creator: uid,
+                reactions: {
+                    like: {
+                        total: 0,
+                        authorsIds: []
+                    },
+                    dislike: {
+                        total: 0,
+                        authorsIds: []
+                    },
+                    fire: {
+                        total: 0,
+                        authorsIds: []
+                    },
+                    laugh: {
+                        total: 0,
+                        authorsIds: []
+                    },
+                    rocket: {
+                        total: 0,
+                        authorsIds: []
+                    },
+                    applause: {
+                        total: 0,
+                        authorsIds: []
+                    },
+                    angry: {
+                        total: 0,
+                        authorsIds: []
+                    },
+                    confused: {
+                        total: 0,
+                        authorsIds: []
+                    },
+                }
             }
             const { success, data } = await deps.projectService.createProject(newProject)
             const projectId = data

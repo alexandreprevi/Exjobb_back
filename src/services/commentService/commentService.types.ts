@@ -1,23 +1,10 @@
-export type ProjectResponse = {
+export type CommentResponse = {
     success: boolean
     data: string
 }
 
-export type ProjectHistoryResponse = {
-    success: boolean
-    data: Project
-}
-
-export type Project = {
-    projectId: string
-    title: string
-    summary: string
-    description: string
-    status: string
-    creator: string
-    coCreators: string []
-    participants?: Participant[]
-    comments: number
+export type Comment = {
+    content: string
     reactions: {
         likes: {
             total: number
@@ -54,28 +41,8 @@ export type Project = {
     }
 }
 
-export type createProjectPayload = {
-    title: string
-    summary: string
-    description: string
-    status: string
-    creator: string
-    coCreators: string []
-    participants?: Participant[]
-}
-
-export type updateProjectPayload = {
-    title: string
-    summary: string
-    description: string
-    status: string
-    coCreators: string []
-    participants?: Participant[]
-}
-
-export type Participant = {
-    userId: string
-    role: string
+export type CommentPayload = {
+    content: string
 }
 
 export interface ServiceError {

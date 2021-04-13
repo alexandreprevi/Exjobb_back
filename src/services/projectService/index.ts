@@ -23,7 +23,7 @@ export const ProjectService = ({ db }): ProjectService => {
             return Promise.resolve({ success: false, data: 'COULD NOT CREATE PROJECT' })
         }
     }
-    const updateProject = async (projectId: string, projectChanges: createProjectPayload) => {
+    const updateProject = async (projectId: string, projectChanges: updateProjectPayload) => {
         try {
             const result = await db.collection('projects').doc(projectId).update(projectChanges)
             return Promise.resolve({ success: true, data: result.id })

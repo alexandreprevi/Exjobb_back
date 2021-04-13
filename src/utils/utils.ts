@@ -1,3 +1,5 @@
+import firebase from 'firebase-admin'
+import { ReactionPayload } from "../services/reactionService/reactionService.types";
 import { UpdateUserInAuthDb, UpdateUserInFirestore, UpdateUserPayload } from "../services/userService/userService.types";
 import { logger } from "./logger";
 
@@ -35,4 +37,56 @@ export const generateIdWithTimestamp = (): string => {
     const weekDay = new Date().getDay()
     const random2DigitsNumber = Math.floor(10 + (99 - 10) * Math.random())
     return `H${year}${month}${day}${weekDay}${hour}${minutes}${seconds}-${random2DigitsNumber}`.toString()
+}
+
+export const prepareReactionData = (reaction: ReactionPayload, uid: string) => {
+    if (reaction.action === 'add') {
+        var incrementMethod = firebase.firestore.FieldValue.increment(1)
+        var arrayMethod = firebase.firestore.FieldValue.arrayUnion(uid)
+    } else if (reaction.action === 'remove') {
+        var incrementMethod = firebase.firestore.FieldValue.increment(-1)
+        var arrayMethod = firebase.firestore.FieldValue.arrayRemove(uid)
+    }
+    switch (reaction.name) {
+        case 'like':
+            return {
+                'reactions.like.total': incrementMethod,
+                'reactions.like.authorsIds': arrayMethod
+            }
+        case 'dislike':
+            return {
+                'reactions.dislike.total': incrementMethod,
+                'reactions.dislike.authorsIds': arrayMethod
+            }
+        case 'laugh':
+            return {
+                'reactions.laugh.total': incrementMethod,
+                'reactions.laugh.authorsIds': arrayMethod
+            }
+        case 'fire':
+            return {
+                'reactions.fire.total': incrementMethod,
+                'reactions.fire.authorsIds': arrayMethod
+            }
+        case 'rocket':
+            return {
+                'reactions.rocket.total': incrementMethod,
+                'reactions.rocket.authorsIds': arrayMethod
+            }
+        case 'confused':
+            return {
+                'reactions.confused.total': incrementMethod,
+                'reactions.confused.authorsIds': arrayMethod
+            }
+        case 'applause':
+            return {
+                'reactions.applause.total': incrementMethod,
+                'reactions.applause.authorsIds': arrayMethod
+            }
+        case 'angry':
+            return {
+                'reactions.angry.total': incrementMethod,
+                'reactions.angry.authorsIds': arrayMethod
+            }
+    }
 }

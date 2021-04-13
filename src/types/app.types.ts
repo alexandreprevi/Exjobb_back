@@ -3,6 +3,8 @@ import { Controllers } from '../controllers'
 import { AliveService } from '../services/aliveService'
 import { UserService } from '../services/userService'
 import { ProjectService } from '../services/projectService'
+import { CommentService } from '../services/commentService'
+import { ReactionService } from '../services/reactionService'
 import { AdminSdkService } from '../services/adminSdkService'
 
 export interface Dependencies {
@@ -12,6 +14,8 @@ export interface Dependencies {
     aliveService: AliveService // There are the typings, not the whole service
     userService: UserService
     projectService: ProjectService
+    commentService: CommentService
+    reactionService: ReactionService
     adminSdkService: AdminSdkService
 }
 

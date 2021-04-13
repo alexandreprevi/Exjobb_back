@@ -6,6 +6,7 @@ import { ProjectService } from '../services/projectService'
 import { CommentService } from '../services/commentService'
 import { ReactionService } from '../services/reactionService'
 import { AdminSdkService } from '../services/adminSdkService'
+import { StorageService } from '../services/storageService'
 
 export interface Dependencies {
     logger: Logger
@@ -18,6 +19,7 @@ export interface Dependencies {
     commentService: CommentService
     reactionService: ReactionService
     adminSdkService: AdminSdkService
+    storageService: StorageService
 }
 
 export interface RouterDeps {

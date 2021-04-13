@@ -12,6 +12,7 @@ import { CommentService } from './services/commentService'
 import { ReactionService } from './services/reactionService'
 import { CreateServer } from './server'
 import { AdminSdkService } from './services/adminSdkService'
+import { StorageService } from './services/storageService'
 
 validateEnv()
 
@@ -34,8 +35,9 @@ const main = async () => {
     const commentService = CommentService({ db })
     const reactionService = ReactionService({ db })
     const adminSdkService = AdminSdkService({ auth })
+    const storageService = StorageService({ storage })
 
-    const deps: Dependencies = { logger, db, auth, storage, aliveService, userService, projectService, commentService, reactionService, adminSdkService }
+    const deps: Dependencies = { logger, db, auth, storage, aliveService, userService, projectService, commentService, reactionService, adminSdkService, storageService }
 
     const server = CreateServer(deps)
     server.start()

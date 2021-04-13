@@ -1,7 +1,7 @@
 import 'dotenv/config'
 import firebase from 'firebase-admin'
 
-import { DB, AUTH } from './database'
+import { DB, AUTH, STORAGE } from './firebase'
 import { Dependencies } from './types/app.types'
 import { logger } from './utils/logger'
 import { validateEnv } from './utils/validateEnv'
@@ -19,12 +19,15 @@ const main = async () => {
     // Intialize DB here
     await firebase.initializeApp({
         credential: firebase.credential.cert(process.env.SERVICE_ACCOUNT),
+        storageBucket: 'exjobb-dev.appspot.com',
     })
 
     // Setup server dependencies, then inject these to each of the controllers
     // allowing each service and controller to act in a modular and testable fashion.
     const { db } = DB(firebase)
     const { auth } = AUTH(firebase)
+    const { storage } = STORAGE(firebase)
+
     const aliveService = AliveService({ db })
     const userService = UserService({ db, auth })
     const projectService = ProjectService({ db })
@@ -32,7 +35,7 @@ const main = async () => {
     const reactionService = ReactionService({ db })
     const adminSdkService = AdminSdkService({ auth })
 
-    const deps: Dependencies = { logger, db, auth, aliveService, userService, projectService, commentService, reactionService, adminSdkService }
+    const deps: Dependencies = { logger, db, auth, storage, aliveService, userService, projectService, commentService, reactionService, adminSdkService }
 
     const server = CreateServer(deps)
     server.start()

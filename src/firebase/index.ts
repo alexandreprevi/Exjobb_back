@@ -11,3 +11,9 @@ export const AUTH = firebase => {
     const auth = firebase.auth()
     return { auth }
 }
+
+export const STORAGE = firebase => {
+    logger.info(`Initializing Firebase Storage...`)
+    const storage = firebase.storage()
+    return { storage }
+}

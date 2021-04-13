@@ -62,6 +62,7 @@ export type createProjectPayload = {
     creator: string
     coCreators: string []
     participants?: Participant[]
+    images: string[]
 }
 
 export type updateProjectPayload = {

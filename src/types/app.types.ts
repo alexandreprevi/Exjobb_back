@@ -11,6 +11,7 @@ export interface Dependencies {
     logger: Logger
     db: any
     auth: any
+    storage: any
     aliveService: AliveService // There are the typings, not the whole service
     userService: UserService
     projectService: ProjectService

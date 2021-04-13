@@ -4,15 +4,22 @@ import { logger } from '../utils/logger'
 import { failedResult, successResult } from './controllerResults'
 
 export interface ProjectController {
-    createProject: (uid: string, project: createProjectPayload) => Promise<ControllerResult>
+    createProject: (uid: string, project: createProjectPayload, files) => Promise<ControllerResult>
     updateProject: (uid: string, projectId: string, ProjectChanges: updateProjectPayload) => Promise<ControllerResult>
     deleteProject: (uid: string, projectId: string) => Promise<ControllerResult>
 }
 
 export const ProjectController = (deps: Dependencies): ProjectController => {
 
-    const createProject = async (uid: string, project: createProjectPayload) => {
+    const createProject = async (uid: string, project: createProjectPayload, files) => {
         try {
+            if (files) {
+                project.images = []
+                files.forEach(file => {
+                    project.images.push(file.cloudStoragePublicUrl)
+                    logger.info(file.cloudStoragePublicUrl)
+                })
+            }
             const newProject = {
                 ...project,
                 creator: uid,

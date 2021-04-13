@@ -3,6 +3,7 @@ import { RouterDeps } from '../types/app.types'
 import { sendOk200Response, sendNotOk200Response, sendNotOk503Response, sendNotOk404Response } from './responses'
 import { dtoValidationMiddleware } from '../middlewares/dtoValidation.middleware'
 import { createUserSchema, updateUserSchema, updateUserSchemaWithAsminSdk, getUserByIdWithAdminSdk, getFirebaseIdTokenWithAdminSdk, deleteUserSchemaWithAdminSdk, setCustomClaimsSchema, createProjectSchema, updateProjectSchema, CommentSchema, ReactionSchema } from '../utils/dtoValidationSchemas'
+import { sendUploadToGCS, upload } from '../middlewares/fileUpload.middleware'
 
 export const RouteHandler = (deps: RouterDeps): Router => {
     const { logger, controllers } = deps
@@ -179,11 +180,12 @@ export const RouteHandler = (deps: RouterDeps): Router => {
     })
 
     // Project
-    router.post('/project', dtoValidationMiddleware(createProjectSchema), async (req: Request, res: Response, next: NextFunction) => {
+    router.post('/project', upload, sendUploadToGCS, dtoValidationMiddleware(createProjectSchema), async (req: Request, res: Response, next: NextFunction) => {
         try {
             const uid = req['uid']
             const project = req.body
-            const { success, data } = await controllers.projectController.createProject(uid, project)
+            const files = req.files
+            const { success, data } = await controllers.projectController.createProject(uid, project, files)
             if (success) {
                 sendOk200Response(req, res, data)
             } else {

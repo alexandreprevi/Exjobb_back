@@ -1,5 +1,10 @@
 export type ProjectResponse = {
   success: boolean
+  data: string | Project
+}
+
+export type CreateProjectResponse = {
+  success: boolean
   data: string
 }
 
@@ -18,6 +23,7 @@ export type Project = {
   coCreators: string[]
   participants?: Participant[]
   comments: number
+  images: string[]
   reactions: {
     likes: {
       total: number

@@ -6,7 +6,7 @@ import winstonDaily from 'winston-daily-rotate-file'
 const logDir = __dirname + '/../logs'
 
 if (!fs.existsSync(logDir)) {
-    fs.mkdirSync(logDir)
+  fs.mkdirSync(logDir)
 }
 
 // winstown format
@@ -21,45 +21,45 @@ const logFormat = printf(({ timestamp, level, message }) => `${timestamp} ${leve
  */
 
 const logger = winston.createLogger({
-    format: combine(
-        timestamp({
-            format: 'YYYY-MM-DD HH:mm:ss',
-        }),
-        logFormat,
-    ),
-    transports: [
-        // info log settings
-        new winstonDaily({
-            level: 'info',
-            datePattern: 'YYYY-MM-DD',
-            dirname: logDir + '/info',  // log file /logs/info/*.log in save
-            filename: `%DATE%.log`,
-            maxFiles: 30, // 30 days saved
-            zippedArchive: true,
-        }),
-        new winstonDaily({
-            level: 'error',
-            datePattern: 'YYYY-MM-DD',
-            dirname: logDir + '/error', // log file /logs/error/*.log in save
-            filename: `%DATE%.error.log`,
-            maxFiles: 30, // 30 Days saved
-            handleExceptions: true,
-            json: false,
-            zippedArchive: true,
-        }),
-    ]
+  format: combine(
+    timestamp({
+      format: 'YYYY-MM-DD HH:mm:ss',
+    }),
+    logFormat,
+  ),
+  transports: [
+    // info log settings
+    new winstonDaily({
+      level: 'info',
+      datePattern: 'YYYY-MM-DD',
+      dirname: logDir + '/info', // log file /logs/info/*.log in save
+      filename: `%DATE%.log`,
+      maxFiles: 30, // 30 days saved
+      zippedArchive: true,
+    }),
+    new winstonDaily({
+      level: 'error',
+      datePattern: 'YYYY-MM-DD',
+      dirname: logDir + '/error', // log file /logs/error/*.log in save
+      filename: `%DATE%.error.log`,
+      maxFiles: 30, // 30 Days saved
+      handleExceptions: true,
+      json: false,
+      zippedArchive: true,
+    }),
+  ],
 })
 
 logger.add(
-    new winston.transports.Console({
-        format: winston.format.combine(winston.format.splat(), winston.format.colorize(), winston.format.simple()),
-    }),
+  new winston.transports.Console({
+    format: winston.format.combine(winston.format.splat(), winston.format.colorize(), winston.format.simple()),
+  }),
 )
 
 const stream = {
-    write: (message: string) => {
-        logger.info(message.substring(0, message.lastIndexOf('\n')))
-    }
+  write: (message: string) => {
+    logger.info(message.substring(0, message.lastIndexOf('\n')))
+  },
 }
 
 export { logger, stream }

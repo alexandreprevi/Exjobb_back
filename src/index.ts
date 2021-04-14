@@ -17,30 +17,30 @@ import { StorageService } from './services/storageService'
 validateEnv()
 
 const main = async () => {
-    // Intialize DB here
-    await firebase.initializeApp({
-        credential: firebase.credential.cert(process.env.SERVICE_ACCOUNT),
-        storageBucket: 'exjobb-dev.appspot.com',
-    })
+  // Intialize DB here
+  await firebase.initializeApp({
+    credential: firebase.credential.cert(process.env.SERVICE_ACCOUNT),
+    storageBucket: 'exjobb-dev.appspot.com',
+  })
 
-    // Setup server dependencies, then inject these to each of the controllers
-    // allowing each service and controller to act in a modular and testable fashion.
-    const { db } = DB(firebase)
-    const { auth } = AUTH(firebase)
-    const { storage } = STORAGE(firebase)
+  // Setup server dependencies, then inject these to each of the controllers
+  // allowing each service and controller to act in a modular and testable fashion.
+  const { db } = DB(firebase)
+  const { auth } = AUTH(firebase)
+  const { storage } = STORAGE(firebase)
 
-    const aliveService = AliveService({ db })
-    const userService = UserService({ db, auth })
-    const projectService = ProjectService({ db })
-    const commentService = CommentService({ db })
-    const reactionService = ReactionService({ db })
-    const adminSdkService = AdminSdkService({ auth })
-    const storageService = StorageService({ storage })
+  const aliveService = AliveService({ db })
+  const userService = UserService({ db, auth })
+  const projectService = ProjectService({ db })
+  const commentService = CommentService({ db })
+  const reactionService = ReactionService({ db })
+  const adminSdkService = AdminSdkService({ auth })
+  const storageService = StorageService({ storage })
 
-    const deps: Dependencies = { logger, db, auth, storage, aliveService, userService, projectService, commentService, reactionService, adminSdkService, storageService }
+  const deps: Dependencies = { logger, db, auth, storage, aliveService, userService, projectService, commentService, reactionService, adminSdkService, storageService }
 
-    const server = CreateServer(deps)
-    server.start()
+  const server = CreateServer(deps)
+  server.start()
 }
 
 main()

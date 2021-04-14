@@ -9,30 +9,30 @@ import { AdminSdkService } from '../services/adminSdkService'
 import { StorageService } from '../services/storageService'
 
 export interface Dependencies {
-    logger: Logger
-    db: any
-    auth: any
-    storage: any
-    aliveService: AliveService // There are the typings, not the whole service
-    userService: UserService
-    projectService: ProjectService
-    commentService: CommentService
-    reactionService: ReactionService
-    adminSdkService: AdminSdkService
-    storageService: StorageService
+  logger: Logger
+  db: any
+  auth: any
+  storage: any
+  aliveService: AliveService // There are the typings, not the whole service
+  userService: UserService
+  projectService: ProjectService
+  commentService: CommentService
+  reactionService: ReactionService
+  adminSdkService: AdminSdkService
+  storageService: StorageService
 }
 
 export interface RouterDeps {
-    logger: Logger
-    controllers: Controllers
+  logger: Logger
+  controllers: Controllers
 }
 
 export interface HttpException {
-    status: number
-    message: string
+  status: number
+  message: string
 }
 
 export type ControllerResult = {
-    success: boolean
-    data: any
+  success: boolean
+  data: any
 }

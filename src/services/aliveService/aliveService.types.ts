@@ -1,13 +1,13 @@
 export type AliveStatus = {
-    success: boolean
-    data: CriticalSystems
+  success: boolean
+  data: CriticalSystems
 }
 
 export type CriticalSystems = {
-    database: boolean
+  database: boolean
 }
 
 export interface ServiceError {
-    success: boolean
-    data: string
+  success: boolean
+  data: string
 }

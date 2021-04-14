@@ -64,7 +64,7 @@ export const StorageService = ({ storage }): StorageService => {
     try {
       const bucket = storage.bucket()
       const result = bucket.deleteFiles({
-        prefix: `${projectId}/`
+        prefix: `${projectId}/`,
       })
       return Promise.resolve({ success: true, data: result })
     } catch (error) {

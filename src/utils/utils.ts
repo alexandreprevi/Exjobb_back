@@ -26,7 +26,7 @@ export const prepareUserObjectForFirestore = (userChanges: UpdateUserPayload): U
   return filtered
 }
 
-export const generateIdWithTimestamp = (): string => {
+export const generateIdWithTimestamp = (letter: string): string => {
   const day = new Date().getDate()
   const year = new Date().getFullYear().toString().substr(-2)
   const month = new Date().getMonth() + 1
@@ -35,7 +35,7 @@ export const generateIdWithTimestamp = (): string => {
   const seconds = new Date().getSeconds()
   const weekDay = new Date().getDay()
   const random2DigitsNumber = Math.floor(10 + (99 - 10) * Math.random())
-  return `H${year}${month}${day}${weekDay}${hour}${minutes}${seconds}-${random2DigitsNumber}`.toString()
+  return `${letter}${year}${month}${day}${weekDay}${hour}${minutes}${seconds}-${random2DigitsNumber}`.toString()
 }
 
 export const prepareReactionData = (reaction: ReactionPayload, uid: string) => {

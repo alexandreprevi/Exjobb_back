@@ -1,17 +1,18 @@
 import { StorageResponse, ServiceError } from './storageService.types'
 
 export interface StorageService {
-  uploadMultipleImages: (uid: string, files) => Promise<StorageResponse | ServiceError>
-  deleteImage: (image: string) => Promise<StorageResponse | ServiceError>
+  uploadMultipleImages: (uid: string, projectId: string, files) => Promise<StorageResponse | ServiceError>
+  deleteOneImage: (image: string, projectId: string) => Promise<StorageResponse | ServiceError>
+  deleteAllImages: (projectId: string) => Promise<StorageResponse | ServiceError>
 }
 
 export const StorageService = ({ storage }): StorageService => {
-  const uploadMultipleImages = async (uid: string, files) => {
+  const uploadMultipleImages = async (uid: string, projectId: string, files) => {
     try {
       let promises = []
       files.forEach((image, index) => {
         const gcsname = uid + '' + Date.now() + index
-        const file = storage.bucket().file(gcsname)
+        const file = storage.bucket().file(projectId + '/' + gcsname)
 
         const promise = new Promise((resolve, reject) => {
           const stream = file.createWriteStream({
@@ -48,17 +49,27 @@ export const StorageService = ({ storage }): StorageService => {
       return Promise.resolve({ success: false, data: 'COULD NOT DELETE IMAGES FROM STORAGE' })
     }
   }
-  const deleteImage = async (image: string) => {
+  const deleteOneImage = async (image: string, projectId: string) => {
     try {
-      // TODO: Find a better way to do this
-      const filename = image.substr(54)
+      const filename = image.substr(54) // TODO: Find a better way to do this
       const bucket = storage.bucket()
-      const file = bucket.file(filename)
+      const file = bucket.file(projectId + '/' + filename)
       const result = file.delete()
+      return Promise.resolve({ success: true, data: result })
+    } catch (error) {
+      return Promise.resolve({ success: false, data: 'COULD NOT DELETE IMAGE FROM STORAGE' })
+    }
+  }
+  const deleteAllImages = async (projectId: string) => {
+    try {
+      const bucket = storage.bucket()
+      const result = bucket.deleteFiles({
+        prefix: `${projectId}/`
+      })
       return Promise.resolve({ success: true, data: result })
     } catch (error) {
       return Promise.resolve({ success: false, data: 'COULD NOT DELETE IMAGES FROM STORAGE' })
     }
   }
-  return { uploadMultipleImages, deleteImage }
+  return { uploadMultipleImages, deleteOneImage, deleteAllImages }
 }

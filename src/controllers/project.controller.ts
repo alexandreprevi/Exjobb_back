@@ -1,6 +1,7 @@
 import { createProjectPayload, updateProjectPayload } from '../services/projectService/projectService.types'
 import { Dependencies, ControllerResult } from '../types/app.types'
 import { logger } from '../utils/logger'
+import { userIsOwner } from '../utils/utils'
 import { failedResult, successResult } from './controllerResults'
 
 export interface ProjectController {
@@ -82,45 +83,49 @@ export const ProjectController = (deps: Dependencies): ProjectController => {
   }
   const updateProject = async (uid: string, projectId: string, projectChanges: createProjectPayload, files) => {
     try {
-      let project
-      if (files) {
-        // GET Project and check how many files are uploaded
-        const { success, data } = await deps.projectService.getProject(projectId)
-        project = data
-        if (!success) {
-          return failedResult(data)
-        } else {
-          // Compare how many files already uploaded to how many files user wants to upload (max 10)
-          if (project.images.length + files.length > 10) {
-            logger.info(project.images.length + files.length)
-            return failedResult('10 files max')
+      const { success, data } = await deps.projectService.getProject(projectId)
+      const project = data
+      if (!success) {
+        return failedResult(data)
+      } else {
+        if (typeof project !== 'string') {
+          // check owner ship of document to update
+          if (userIsOwner(uid, project.creator) === false) {
+            return failedResult('NOT OWNER OF THIS DOCUMENT')
           } else {
-            logger.info(project.images.length + files.length)
-            const { success, data } = await deps.storageService.uploadMultipleImages(uid, files)
-            if (!success) {
-              return failedResult(data)
-            } else {
-              files.forEach(file => {
-                project.images.push(file.cloudStoragePublicUrl)
-                logger.info(file.cloudStoragePublicUrl)
-              })
-              projectChanges = {
-                ...projectChanges,
-                images: project.images,
+            // check total of uploaded files on the project
+            if (files && project.images.length + files.length > 10) {
+              return failedResult('10 files max')
+            } else if (files && project.images.length + files.length <= 10) {
+              // upload files
+              const { success, data } = await deps.storageService.uploadMultipleImages(uid, files)
+              if (!success) {
+                return failedResult(data)
+              } else {
+                files.forEach(file => {
+                  project.images.push(file.cloudStoragePublicUrl)
+                  logger.info(file.cloudStoragePublicUrl)
+                })
+                projectChanges = {
+                  ...projectChanges,
+                  images: project.images,
+                }
               }
             }
           }
         }
-      }
-      const { success, data } = await deps.projectService.updateProject(projectId, projectChanges)
-      if (!success) {
-        return failedResult(data)
-      } else {
-        const { success, data } = await deps.projectService.updateProjectHistory(uid, projectId, 'updated project')
-        if (success) {
-          return successResult(data)
-        } else {
+        // update project in Cloud firestore
+        const { success, data } = await deps.projectService.updateProject(projectId, projectChanges)
+        if (!success) {
           return failedResult(data)
+        } else {
+          // update project history subcollection
+          const { success, data } = await deps.projectService.updateProjectHistory(uid, projectId, 'updated project')
+          if (success) {
+            return successResult(data)
+          } else {
+            return failedResult(data)
+          }
         }
       }
     } catch (error) {

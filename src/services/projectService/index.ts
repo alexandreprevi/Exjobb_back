@@ -1,11 +1,11 @@
 import firebase from 'firebase-admin'
 import { logger } from '../../utils/logger'
 import { generateIdWithTimestamp } from '../../utils/utils'
-import { Project, ProjectResponse, ServiceError, createProjectPayload, ProjectHistoryResponse, updateProjectPayload } from './projectService.types'
+import { Project, ProjectResponse, ServiceError, createProjectPayload, ProjectHistoryResponse, updateProjectPayload, CreateProjectResponse } from './projectService.types'
 
 export interface ProjectService {
   getProject: (projectId: string) => Promise<ProjectResponse | ServiceError>
-  createProject: (project: createProjectPayload) => Promise<ProjectResponse | ServiceError>
+  createProject: (project: createProjectPayload) => Promise<CreateProjectResponse | ServiceError>
   updateProject: (projectId: string, projectChanges: updateProjectPayload) => Promise<ProjectResponse | ServiceError>
   deleteProject: (projectId: string) => Promise<ProjectResponse | ServiceError>
   deleteImage: (projectId: string, image: string) => Promise<ProjectResponse | ServiceError>

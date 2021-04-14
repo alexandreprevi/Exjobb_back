@@ -1,7 +1,6 @@
 import firebase from 'firebase-admin'
 import { ReactionPayload } from '../services/reactionService/reactionService.types'
 import { UpdateUserInAuthDb, UpdateUserInFirestore, UpdateUserPayload } from '../services/userService/userService.types'
-import { logger } from './logger'
 
 export const prepareUserObjectForAuthDb = (userChanges: UpdateUserPayload): UpdateUserInAuthDb => {
   const allowedFields = ['email', 'displayName', 'photoURL']
@@ -91,4 +90,8 @@ export const prepareReactionData = (reaction: ReactionPayload, uid: string) => {
         'reactions.angry.authorsIds': arrayMethod,
       }
   }
+}
+
+export const userIsOwner = (requestAuthorid: string, documentAuthorId: string): boolean => {
+  return requestAuthorid === documentAuthorId
 }

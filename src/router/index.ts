@@ -1,4 +1,4 @@
-import { Router, Request, Response, NextFunction, request, response } from 'express'
+import { Router, Request, Response, NextFunction } from 'express'
 import { RouterDeps } from '../types/app.types'
 import { sendOk200Response, sendNotOk200Response, sendNotOk503Response, sendNotOk404Response } from './responses'
 import { dtoValidationMiddleware } from '../middlewares/dtoValidation.middleware'

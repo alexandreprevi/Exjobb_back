@@ -4,6 +4,7 @@ import { logger } from '../utils/logger'
 import { failedResult, successResult } from './controllerResults'
 
 export interface ProjectController {
+  getProject: (projectId: string) => Promise<ControllerResult>
   createProject: (uid: string, project: createProjectPayload, files) => Promise<ControllerResult>
   updateProject: (uid: string, projectId: string, ProjectChanges: updateProjectPayload, files) => Promise<ControllerResult>
   deleteProjectImage: (uid: string, projectId: string, image: string) => Promise<ControllerResult>
@@ -21,7 +22,6 @@ export const ProjectController = (deps: Dependencies): ProjectController => {
           project.images = []
           files.forEach(file => {
             project.images.push(file.cloudStoragePublicUrl)
-            logger.info(file.cloudStoragePublicUrl)
           })
         }
       }
@@ -82,6 +82,36 @@ export const ProjectController = (deps: Dependencies): ProjectController => {
   }
   const updateProject = async (uid: string, projectId: string, projectChanges: createProjectPayload, files) => {
     try {
+      let project
+      if (files) {
+        // GET Project and check how many files are uploaded
+        const { success, data } = await deps.projectService.getProject(projectId)
+        project = data
+        if (!success) {
+          return failedResult(data)
+        } else {
+          // Compare how many files already uploaded to how many files user wants to upload (max 10)
+          if (project.images.length + files.length > 10) {
+            logger.info(project.images.length + files.length)
+            return failedResult('10 files max')
+          } else {
+            logger.info(project.images.length + files.length)
+            const { success, data } = await deps.storageService.uploadMultipleImages(uid, files)
+            if (!success) {
+              return failedResult(data)
+            } else {
+              files.forEach(file => {
+                project.images.push(file.cloudStoragePublicUrl)
+                logger.info(file.cloudStoragePublicUrl)
+              })
+              projectChanges = {
+                ...projectChanges,
+                images: project.images,
+              }
+            }
+          }
+        }
+      }
       const { success, data } = await deps.projectService.updateProject(projectId, projectChanges)
       if (!success) {
         return failedResult(data)
@@ -138,5 +168,17 @@ export const ProjectController = (deps: Dependencies): ProjectController => {
       throw new Error(error)
     }
   }
-  return { createProject, updateProject, deleteProjectImage, deleteProject }
+  const getProject = async (projectId: string) => {
+    try {
+      const { success, data } = await deps.projectService.getProject(projectId)
+      if (success) {
+        return successResult(data)
+      } else {
+        return failedResult(data)
+      }
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
+  return { getProject, createProject, updateProject, deleteProjectImage, deleteProject }
 }

@@ -193,6 +193,19 @@ export const RouteHandler = (deps: RouterDeps): Router => {
   })
 
   // Project
+  router.get('/project/:projectId', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { projectId } = req.params
+      const { success, data } = await controllers.projectController.getProject(projectId)
+      if (success) {
+        sendOk200Response(req, res, data)
+      } else {
+        sendNotOk503Response(req, res, data)
+      }
+    } catch (error) {
+      next(error)
+    }
+  })
   router.post('/project', upload, dtoValidationMiddleware(createProjectSchema), async (req: Request, res: Response, next: NextFunction) => {
     try {
       const uid = req['uid']

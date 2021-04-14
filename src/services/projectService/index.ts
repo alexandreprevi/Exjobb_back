@@ -4,6 +4,7 @@ import { generateIdWithTimestamp } from '../../utils/utils'
 import { Project, ProjectResponse, ServiceError, createProjectPayload, ProjectHistoryResponse, updateProjectPayload } from './projectService.types'
 
 export interface ProjectService {
+  getProject: (projectId: string) => Promise<ProjectResponse | ServiceError>
   createProject: (project: createProjectPayload) => Promise<ProjectResponse | ServiceError>
   updateProject: (projectId: string, projectChanges: updateProjectPayload) => Promise<ProjectResponse | ServiceError>
   deleteProject: (projectId: string) => Promise<ProjectResponse | ServiceError>
@@ -12,6 +13,14 @@ export interface ProjectService {
 }
 
 export const ProjectService = ({ db }): ProjectService => {
+  const getProject = async (projectId: string) => {
+    try {
+      const result = await db.collection('projects').doc(projectId).get()
+      return Promise.resolve({ success: true, data: result.data() })
+    } catch (error) {
+      return Promise.resolve({ success: false, data: 'COULD NOT GET PROJECT' })
+    }
+  }
   const createProject = async (project: createProjectPayload) => {
     try {
       const newProject = {
@@ -67,5 +76,5 @@ export const ProjectService = ({ db }): ProjectService => {
     }
   }
 
-  return { createProject, updateProject, deleteProject, deleteImage, updateProjectHistory }
+  return { getProject, createProject, updateProject, deleteProject, deleteImage, updateProjectHistory }
 }

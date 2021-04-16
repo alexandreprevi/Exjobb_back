@@ -49,6 +49,8 @@ export const CommentController = (deps: Dependencies): CommentController => {
           },
         },
       }
+      // TODO: this might be a batch write
+      // Need to update the project comments count
       const { success, data } = await deps.commentService.createComment(projectId, newComment)
       if (success) {
         return successResult(data)
@@ -73,6 +75,8 @@ export const CommentController = (deps: Dependencies): CommentController => {
   }
   const deleteComment = async (projectId: string, commentId: string) => {
     try {
+      // TODO: this might be a batch write
+      // Need to update the project comments count
       const { success, data } = await deps.commentService.deleteComment(projectId, commentId)
       if (success) {
         return successResult(data)

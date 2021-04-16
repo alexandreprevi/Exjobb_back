@@ -8,7 +8,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     // Apply authentication by default on all routes.
     // We can add exceptions manually here.
     // We'll allow non-authenticated checking whether the service is alive.
-    const nonAuthRoutes = ['/alive', '/createuser', '/admin/getidtoken', '/admin/user', '/admin/setcustomclaims']
+    const nonAuthRoutes = ['/alive', '/register', '/admin/getidtoken', '/admin/user', '/admin/setcustomclaims', '/projects']
     if (nonAuthRoutes.indexOf(req.path) > -1) {
       next()
     } else {
@@ -36,6 +36,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
           // Extract uid and email
           req['uid'] = decodedToken.uid
           req['userEmail'] = decodedToken.email
+          decodedToken.name ? req['username'] = decodedToken.name : req['username'] = 'nousername'
           return next()
         } catch (error) {
           sendNotOk401Response(req, res, 'Not authenticated.')

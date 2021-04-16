@@ -148,10 +148,10 @@ export const RouteHandler = (deps: RouterDeps): Router => {
     }
   })
 
-  router.post('/createuser', dtoValidationMiddleware(createUserSchema), async (req: Request, res: Response, next: NextFunction) => {
+  router.post('/register', dtoValidationMiddleware(createUserSchema), async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = req.body
-      const { success, data } = await controllers.userController.createUser(user)
+      const { success, data } = await controllers.userController.register(user)
       if (success) {
         sendOk200Response(req, res, data)
       } else {
@@ -193,6 +193,18 @@ export const RouteHandler = (deps: RouterDeps): Router => {
   })
 
   // Project
+  router.get('/projects/', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { success, data } = await controllers.projectController.getProjects()
+      if (success) {
+        sendOk200Response(req, res, data)
+      } else {
+        sendNotOk503Response(req, res, data)
+      }
+    } catch (error) {
+      next(error)
+    }
+  })
   router.get('/project/:projectId', async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { projectId } = req.params
@@ -209,9 +221,10 @@ export const RouteHandler = (deps: RouterDeps): Router => {
   router.post('/project', upload, dtoValidationMiddleware(createProjectSchema), async (req: Request, res: Response, next: NextFunction) => {
     try {
       const uid = req['uid']
+      const username = req['username']
       const project = req.body
       const files = req.files
-      const { success, data } = await controllers.projectController.createProject(uid, project, files)
+      const { success, data } = await controllers.projectController.createProject(uid, username, project, files)
       if (success) {
         sendOk200Response(req, res, data)
       } else {

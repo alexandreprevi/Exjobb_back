@@ -1,9 +1,10 @@
 import firebase from 'firebase-admin'
 import { logger } from '../../utils/logger'
 import { generateIdWithTimestamp } from '../../utils/utils'
-import { Project, ProjectResponse, ServiceError, createProjectPayload, ProjectHistoryResponse, updateProjectPayload, CreateProjectResponse } from './projectService.types'
+import { Project, ProjectResponse, ProjectsResponse, ServiceError, createProjectPayload, ProjectHistoryResponse, updateProjectPayload, CreateProjectResponse } from './projectService.types'
 
 export interface ProjectService {
+  getProjects: () => Promise<ProjectsResponse | ServiceError>
   getProject: (projectId: string) => Promise<ProjectResponse | ServiceError>
   createProject: (project: createProjectPayload, projectId: string) => Promise<CreateProjectResponse | ServiceError>
   updateProject: (projectId: string, projectChanges: updateProjectPayload) => Promise<ProjectResponse | ServiceError>
@@ -13,10 +14,29 @@ export interface ProjectService {
 }
 
 export const ProjectService = ({ db }): ProjectService => {
+  const getProjects = async () => {
+    try {
+      const result = await db.collection('projects').orderBy('created', 'desc').get()
+      const projects = []
+      result.forEach((doc: FirebaseFirestore.DocumentSnapshot) => {
+        projects.push({
+          projectId: doc.id,
+          ...doc.data(),
+        })
+      })  
+      return Promise.resolve({ success: true, data: projects })
+    } catch (error) {
+      return Promise.resolve({ success: false, data: 'COULD NOT GET PROJECTS' })
+    }
+  }
   const getProject = async (projectId: string) => {
     try {
       const result = await db.collection('projects').doc(projectId).get()
-      return Promise.resolve({ success: true, data: result.data() })
+      const project = {
+        projectId: projectId,
+        ...result.data(),
+      }
+      return Promise.resolve({ success: true, data: project })
     } catch (error) {
       return Promise.resolve({ success: false, data: 'COULD NOT GET PROJECT' })
     }
@@ -25,7 +45,7 @@ export const ProjectService = ({ db }): ProjectService => {
     try {
       const newProject = {
         ...project,
-        created: firebase.firestore.FieldValue.serverTimestamp(),
+        createdAt: new Date().toISOString(),
       }
       const result = await db.collection('projects').doc(projectId).set(newProject)
       return Promise.resolve({ success: true, data: result.id })
@@ -36,6 +56,10 @@ export const ProjectService = ({ db }): ProjectService => {
   const updateProject = async (projectId: string, projectChanges: updateProjectPayload) => {
     try {
       const result = await db.collection('projects').doc(projectId).update(projectChanges)
+      const updatedProject = {
+        ...projectChanges,
+        updatedAt: new Date().toISOString()
+      }
       return Promise.resolve({ success: true, data: result.id })
     } catch (error) {
       return Promise.resolve({ success: false, data: 'COULD NOT UPDATE PROJECT' })
@@ -69,12 +93,12 @@ export const ProjectService = ({ db }): ProjectService => {
         .doc(projectId)
         .collection('history')
         .doc(generateIdWithTimestamp('H'))
-        .set({ event: { author: uid, action: action, timestamp: firebase.firestore.FieldValue.serverTimestamp() } }, { merge: true })
+        .set({ event: { author: uid, action: action, timestamp: new Date().toISOString() } }, { merge: true })
       return Promise.resolve({ success: true, data: result })
     } catch (error) {
       return Promise.resolve({ success: false, data: 'COULD NOT UPDATE PROJECT HISTORY' })
     }
   }
 
-  return { getProject, createProject, updateProject, deleteProject, deleteOneImage, updateProjectHistory }
+  return { getProject, getProjects, createProject, updateProject, deleteProject, deleteOneImage, updateProjectHistory }
 }

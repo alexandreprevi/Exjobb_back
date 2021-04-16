@@ -7,7 +7,7 @@ import { failedResult, successResult } from './controllerResults'
 export interface UserController {
   getUserByEmail: (email: string) => Promise<ControllerResult>
   getUserById: (id: string) => Promise<ControllerResult>
-  createUser: (user: User) => Promise<ControllerResult>
+  register: (user: User) => Promise<ControllerResult>
   updateUser: (uid: string, userChanges: UpdateUserPayload) => Promise<ControllerResult>
   deleteUser: (uid: string) => Promise<ControllerResult>
 }
@@ -37,7 +37,7 @@ export const UserController = (deps: Dependencies): UserController => {
       throw new Error(error)
     }
   }
-  const createUser = async (user: User) => {
+  const register = async (user: User) => {
     try {
       const { firstName, lastName, email, password } = user
       const displayName = `${firstName} ${lastName[0]}`
@@ -57,7 +57,7 @@ export const UserController = (deps: Dependencies): UserController => {
             firstName,
             lastName,
             email,
-            displayName,
+            username: userRecord.displayName,
           }
           const { success, data } = await deps.userService.createUserInFirestore(newUserFirestore)
           if (success) {
@@ -113,5 +113,5 @@ export const UserController = (deps: Dependencies): UserController => {
     }
   }
 
-  return { getUserByEmail, getUserById, createUser, updateUser, deleteUser }
+  return { getUserByEmail, getUserById, register, updateUser, deleteUser }
 }

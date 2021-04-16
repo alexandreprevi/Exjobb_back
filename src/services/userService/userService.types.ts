@@ -62,7 +62,7 @@ export type createUserFirestore = {
   uid: string
   firstName: string
   lastName: string
-  displayName: string
+  username: string
   email: string
 }
 

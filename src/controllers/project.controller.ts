@@ -5,15 +5,16 @@ import { generateIdWithTimestamp, userIsOwner } from '../utils/utils'
 import { failedResult, successResult } from './controllerResults'
 
 export interface ProjectController {
+  getProjects: () => Promise<ControllerResult>
   getProject: (projectId: string) => Promise<ControllerResult>
-  createProject: (uid: string, project: createProjectPayload, files) => Promise<ControllerResult>
+  createProject: (uid: string, username: string, project: createProjectPayload, files) => Promise<ControllerResult>
   updateProject: (uid: string, projectId: string, ProjectChanges: updateProjectPayload, files) => Promise<ControllerResult>
   deleteProjectImage: (uid: string, projectId: string, image: string) => Promise<ControllerResult>
   deleteProject: (uid: string, projectId: string) => Promise<ControllerResult>
 }
 
 export const ProjectController = (deps: Dependencies): ProjectController => {
-  const createProject = async (uid: string, project: createProjectPayload, files) => {
+  const createProject = async (uid: string, username: string, project: createProjectPayload, files) => {
     try {
       const projectId = generateIdWithTimestamp('P')
       logger.info(projectId)
@@ -31,7 +32,8 @@ export const ProjectController = (deps: Dependencies): ProjectController => {
 
       const newProject = {
         ...project,
-        creator: uid,
+        creatorId: uid,
+        creator: username,
         reactions: {
           like: {
             total: 0,
@@ -115,6 +117,7 @@ export const ProjectController = (deps: Dependencies): ProjectController => {
             }
           }
         }
+        // TODO: this might be a batch write
         // update project in Cloud firestore
         const { success, data } = await deps.projectService.updateProject(projectId, projectChanges)
         if (!success) {
@@ -141,6 +144,7 @@ export const ProjectController = (deps: Dependencies): ProjectController => {
         return failedResult(data)
       } else {
         // DELETE from project
+        // TODO: this might be a batch write
         const { success, data } = await deps.projectService.deleteOneImage(projectId, image)
         if (!success) {
           return failedResult(data)
@@ -172,6 +176,7 @@ export const ProjectController = (deps: Dependencies): ProjectController => {
             return failedResult(data)
           } else {
             // delete from firestore
+            // TODO: this might be a batch write
             const { success, data } = await deps.projectService.deleteProject(projectId)
             if (!success) {
               return failedResult(data)
@@ -191,6 +196,18 @@ export const ProjectController = (deps: Dependencies): ProjectController => {
       throw new Error(error)
     }
   }
+  const getProjects = async () => {
+    try {
+      const { success, data } = await deps.projectService.getProjects()
+      if (success) {
+        return successResult(data)
+      } else {
+        return failedResult(data)
+      }
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
   const getProject = async (projectId: string) => {
     try {
       const { success, data } = await deps.projectService.getProject(projectId)
@@ -203,5 +220,5 @@ export const ProjectController = (deps: Dependencies): ProjectController => {
       throw new Error(error)
     }
   }
-  return { getProject, createProject, updateProject, deleteProjectImage, deleteProject }
+  return { getProjects, getProject, createProject, updateProject, deleteProjectImage, deleteProject }
 }

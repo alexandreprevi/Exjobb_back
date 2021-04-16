@@ -51,9 +51,9 @@ export const UserService = ({ db, auth }): UserService => {
       const user = {
         firstName: newUserFirestore.firstName,
         lastName: newUserFirestore.lastName,
-        displayName: newUserFirestore.displayName,
+        username: newUserFirestore.username,
         email: newUserFirestore.email,
-        created: firebase.firestore.FieldValue.serverTimestamp(),
+        createdAt: new Date().toISOString(),
       }
       const result = await db.collection('users').doc(newUserFirestore.uid).set(user)
       return Promise.resolve({ success: true, data: result })
@@ -71,11 +71,11 @@ export const UserService = ({ db, auth }): UserService => {
   }
   const updateUserInFirestore = async (uid: string, userChanges: UpdateUserPayload) => {
     try {
-      const user = {
+      const updatedUser = {
         ...userChanges,
-        updated: firebase.firestore.FieldValue.serverTimestamp(),
+        updatedAt: new Date().toISOString(),
       }
-      const result = await db.collection('users').doc(uid).update(user)
+      const result = await db.collection('users').doc(uid).update(updatedUser)
       return Promise.resolve({ success: true, data: result })
     } catch (error) {
       return Promise.resolve({ success: false, data: 'COULD NOT UPDATE USER IN FIRESTORE' })

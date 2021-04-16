@@ -12,7 +12,7 @@ export const CommentService = ({ db }): CommentService => {
     try {
       const newcomment = {
         ...comment,
-        created: firebase.firestore.FieldValue.serverTimestamp(),
+        createdAt: new Date().toISOString(),
       }
       await db.collection('projects').doc(projectId).collection('comments').add(newcomment)
       return Promise.resolve({ success: true, data: 'CREATED' })
@@ -23,6 +23,10 @@ export const CommentService = ({ db }): CommentService => {
   const updateComment = async (projectId: string, commentId: string, commentChanges: CommentPayload) => {
     try {
       const result = await db.collection('projects').doc(projectId).collection('comments').doc(commentId).update(commentChanges)
+      const updatedComment = {
+        ...commentChanges,
+        updatedAt: new Date().toISOString(),
+      }
       return Promise.resolve({ success: true, data: 'UPDATED' })
     } catch (error) {
       return Promise.resolve({ success: false, data: 'COULD NOT UPDATE COMMENT' })

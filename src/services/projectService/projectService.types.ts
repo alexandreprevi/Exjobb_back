@@ -3,6 +3,11 @@ export type ProjectResponse = {
   data: string | Project
 }
 
+export type ProjectsResponse = {
+  success: boolean
+  data: string | Project[]
+}
+
 export type CreateProjectResponse = {
   success: boolean
   data: string

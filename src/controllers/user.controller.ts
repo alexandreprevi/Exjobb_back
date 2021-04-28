@@ -61,7 +61,7 @@ export const UserController = (deps: Dependencies): UserController => {
           }
           const { success, data } = await deps.userService.createUserInFirestore(newUserFirestore)
           if (success) {
-            return successResult(data)
+            return successResult(userRecord)
           } else {
             return failedResult(data)
           }

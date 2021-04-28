@@ -148,6 +148,21 @@ export const RouteHandler = (deps: RouterDeps): Router => {
     }
   })
 
+  // router.get('/user', async (req: Request, res: Response, next: NextFunction) => {
+  //   try {
+  //     const userId = req.query.userId
+  //     const username = req.query.username
+  //     const { success, data } = await controllers.userController.getUserById(userId)
+  //     if (success) {
+  //       sendOk200Response(req, res, data)
+  //     } else {
+  //       sendNotOk503Response(req, res, data)
+  //     }
+  //   } catch (error) {
+  //     next(error)
+  //   }
+  // })
+
   router.post('/register', dtoValidationMiddleware(createUserSchema), async (req: Request, res: Response, next: NextFunction) => {
     try {
       const user = req.body
@@ -193,7 +208,20 @@ export const RouteHandler = (deps: RouterDeps): Router => {
   })
 
   // Project
-  router.get('/projects/', async (req: Request, res: Response, next: NextFunction) => {
+  router.get('/user/:userId/projects', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { userId } = req.params
+      const { success, data } = await controllers.projectController.getUserProjects(userId)
+      if (success) {
+        sendOk200Response(req, res, data)
+      } else {
+        sendNotOk503Response(req, res, data)
+      }
+    } catch (error) {
+      next(error)
+    }
+  })
+  router.get('/projects', async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { success, data } = await controllers.projectController.getProjects()
       if (success) {

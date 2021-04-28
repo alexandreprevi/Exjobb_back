@@ -11,8 +11,8 @@ export const StorageService = ({ storage }): StorageService => {
     try {
       let promises = []
       files.forEach((image, index) => {
-        const gcsname = uid + '' + Date.now() + index
-        const file = storage.bucket().file(projectId + '/' + gcsname)
+        const gcsname = projectId + '/' + uid + '' + Date.now() + index
+        const file = storage.bucket().file(gcsname)
 
         const promise = new Promise((resolve, reject) => {
           const stream = file.createWriteStream({
@@ -64,7 +64,7 @@ export const StorageService = ({ storage }): StorageService => {
     try {
       const bucket = storage.bucket()
       const result = bucket.deleteFiles({
-        prefix: `${projectId}/`
+        prefix: `${projectId}/`,
       })
       return Promise.resolve({ success: true, data: result })
     } catch (error) {

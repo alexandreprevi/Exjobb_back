@@ -12,6 +12,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
     if (nonAuthRoutes.indexOf(req.path) > -1) {
       next()
     } else {
+      // next()
       if (!req.headers.authorization) {
         return sendNotOk401Response(req, res, 'Not authenticated.')
       }
@@ -36,7 +37,7 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
           // Extract uid and email
           req['uid'] = decodedToken.uid
           req['userEmail'] = decodedToken.email
-          decodedToken.name ? req['username'] = decodedToken.name : req['username'] = 'nousername'
+          decodedToken.name ? (req['username'] = decodedToken.name) : (req['username'] = 'nousername')
           return next()
         } catch (error) {
           sendNotOk401Response(req, res, 'Not authenticated.')

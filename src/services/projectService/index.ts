@@ -4,6 +4,7 @@ import { generateIdWithTimestamp } from '../../utils/utils'
 import { Project, ProjectResponse, ProjectsResponse, ServiceError, createProjectPayload, ProjectHistoryResponse, updateProjectPayload, CreateProjectResponse } from './projectService.types'
 
 export interface ProjectService {
+  getUserProjects: (userId: string) => Promise<ProjectsResponse | ServiceError>
   getProjects: () => Promise<ProjectsResponse | ServiceError>
   getProject: (projectId: string) => Promise<ProjectResponse | ServiceError>
   createProject: (project: createProjectPayload, projectId: string) => Promise<CreateProjectResponse | ServiceError>
@@ -14,14 +15,34 @@ export interface ProjectService {
 }
 
 export const ProjectService = ({ db }): ProjectService => {
-  const getProjects = async () => {
+  const getUserProjects = async (userId: string) => {
     try {
-      const result = await db.collection('projects').orderBy('created', 'desc').get()
+      logger.info(userId)
+      const result = await db.collection('projects').where('creatorId', '==', userId).get()
       const projects = []
       result.forEach((doc: FirebaseFirestore.DocumentSnapshot) => {
+        logger.info(doc.data().title)
+        logger.info(doc.id)
         projects.push({
-          projectId: doc.id,
           ...doc.data(),
+          projectId: doc.id,
+        })
+      })  
+      return Promise.resolve({ success: true, data: projects })
+    } catch (error) {
+      return Promise.resolve({ success: false, data: 'COULD NOT GET USER PROJECTS' })
+    }
+  }
+  const getProjects = async () => {
+    try {
+      const result = await db.collection('projects').orderBy('createdAt', 'desc').get()
+      const projects = []
+      result.forEach((doc: FirebaseFirestore.DocumentSnapshot) => {
+        logger.info(doc.data().title)
+        logger.info(doc.id)
+        projects.push({
+          ...doc.data(),
+          projectId: doc.id,
         })
       })  
       return Promise.resolve({ success: true, data: projects })
@@ -100,5 +121,5 @@ export const ProjectService = ({ db }): ProjectService => {
     }
   }
 
-  return { getProject, getProjects, createProject, updateProject, deleteProject, deleteOneImage, updateProjectHistory }
+  return { getUserProjects, getProject, getProjects, createProject, updateProject, deleteProject, deleteOneImage, updateProjectHistory }
 }

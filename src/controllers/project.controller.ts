@@ -5,6 +5,7 @@ import { generateIdWithTimestamp, userIsOwner } from '../utils/utils'
 import { failedResult, successResult } from './controllerResults'
 
 export interface ProjectController {
+  getUserProjects: (userId: string) => Promise<ControllerResult>
   getProjects: () => Promise<ControllerResult>
   getProject: (projectId: string) => Promise<ControllerResult>
   createProject: (uid: string, username: string, project: createProjectPayload, files) => Promise<ControllerResult>
@@ -196,6 +197,18 @@ export const ProjectController = (deps: Dependencies): ProjectController => {
       throw new Error(error)
     }
   }
+  const getUserProjects = async (userId: string) => {
+    try {
+      const { success, data } = await deps.projectService.getUserProjects(userId)
+      if (success) {
+        return successResult(data)
+      } else {
+        return failedResult(data)
+      }
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
   const getProjects = async () => {
     try {
       const { success, data } = await deps.projectService.getProjects()
@@ -220,5 +233,5 @@ export const ProjectController = (deps: Dependencies): ProjectController => {
       throw new Error(error)
     }
   }
-  return { getProjects, getProject, createProject, updateProject, deleteProjectImage, deleteProject }
+  return { getUserProjects, getProjects, getProject, createProject, updateProject, deleteProjectImage, deleteProject }
 }

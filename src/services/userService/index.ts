@@ -1,8 +1,9 @@
 import firebase from 'firebase-admin'
 import { logger } from '../../utils/logger'
-import { UserResponse, ServiceError, User, UserRecord, createUserAuthDb, UserRecordResponse, createUserFirestore, UpdateUserPayload } from './userService.types'
+import { UserResponse, ServiceError, UsersResponse, User, UserRecord, createUserAuthDb, UserRecordResponse, createUserFirestore, UpdateUserPayload } from './userService.types'
 
 export interface UserService {
+  getUsers: () => Promise<UsersResponse | ServiceError>
   getUserByEmail: (email: string) => Promise<UserResponse | ServiceError>
   getUserById: (id: string) => Promise<UserResponse | ServiceError>
   createUserInAuthDb: (newUserAuthDb: createUserAuthDb) => Promise<UserRecordResponse | ServiceError>
@@ -18,6 +19,21 @@ export interface UserService {
 // directly from the client instead
 
 export const UserService = ({ db, auth }): UserService => {
+  const getUsers = async () => {
+    try {
+      const result = await db.collection('users').get()
+      const users = []
+      result.forEach((doc: FirebaseFirestore.DocumentSnapshot) => {
+        users.push({
+          ...doc.data(),
+          id: doc.id,
+        })
+      })
+      return Promise.resolve({ success: true, data: users })
+    } catch (error) {
+      return Promise.resolve({ success: false, data: 'COULD NOT GET USER BY EMAIL' })
+    }
+  }
   const getUserByEmail = async (email: string) => {
     try {
       const result = await db.collection('users').where('email', '==', email.toLowerCase()).get()
@@ -98,5 +114,5 @@ export const UserService = ({ db, auth }): UserService => {
     }
   }
 
-  return { getUserByEmail, getUserById, createUserInAuthDb, createUserInFirestore, updateUserInAuthDb, updateUserInFirestore, deleteUserInAuthDb, deleteUserInFirestore }
+  return { getUsers, getUserByEmail, getUserById, createUserInAuthDb, createUserInFirestore, updateUserInAuthDb, updateUserInFirestore, deleteUserInAuthDb, deleteUserInFirestore }
 }

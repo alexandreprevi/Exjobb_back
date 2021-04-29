@@ -148,6 +148,19 @@ export const RouteHandler = (deps: RouterDeps): Router => {
     }
   })
 
+  router.get('/users', async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { success, data } = await controllers.userController.getUsers()
+      if (success) {
+        sendOk200Response(req, res, data)
+      } else {
+        sendNotOk503Response(req, res, data)
+      }
+    } catch (error) {
+      next(error)
+    }
+  })
+
   // router.get('/user', async (req: Request, res: Response, next: NextFunction) => {
   //   try {
   //     const userId = req.query.userId

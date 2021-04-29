@@ -27,7 +27,7 @@ export const ProjectService = ({ db }): ProjectService => {
           ...doc.data(),
           projectId: doc.id,
         })
-      })  
+      })
       return Promise.resolve({ success: true, data: projects })
     } catch (error) {
       return Promise.resolve({ success: false, data: 'COULD NOT GET USER PROJECTS' })
@@ -42,9 +42,9 @@ export const ProjectService = ({ db }): ProjectService => {
         logger.info(doc.id)
         projects.push({
           ...doc.data(),
-          projectId: doc.id,
+          id: doc.id,
         })
-      })  
+      })
       return Promise.resolve({ success: true, data: projects })
     } catch (error) {
       return Promise.resolve({ success: false, data: 'COULD NOT GET PROJECTS' })
@@ -79,7 +79,7 @@ export const ProjectService = ({ db }): ProjectService => {
       const result = await db.collection('projects').doc(projectId).update(projectChanges)
       const updatedProject = {
         ...projectChanges,
-        updatedAt: new Date().toISOString()
+        updatedAt: new Date().toISOString(),
       }
       return Promise.resolve({ success: true, data: result.id })
     } catch (error) {

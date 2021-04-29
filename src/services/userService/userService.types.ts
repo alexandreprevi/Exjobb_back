@@ -3,6 +3,11 @@ export type UserResponse = {
   data: User
 }
 
+export type UsersResponse = {
+  success: boolean
+  data: User[]
+}
+
 export type UserRecordResponse = {
   success: boolean
   data: UserRecord

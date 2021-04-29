@@ -44,7 +44,7 @@ export const ProjectController = (deps: Dependencies): ProjectController => {
             total: 0,
             authorsIds: [],
           },
-          fire: {
+          hooray: {
             total: 0,
             authorsIds: [],
           },
@@ -65,6 +65,10 @@ export const ProjectController = (deps: Dependencies): ProjectController => {
             authorsIds: [],
           },
           confused: {
+            total: 0,
+            authorsIds: [],
+          },
+          heart: {
             total: 0,
             authorsIds: [],
           },

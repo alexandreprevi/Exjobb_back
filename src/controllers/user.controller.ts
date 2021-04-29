@@ -5,6 +5,7 @@ import { prepareUserObjectForAuthDb, prepareUserObjectForFirestore } from '../ut
 import { failedResult, successResult } from './controllerResults'
 
 export interface UserController {
+  getUsers: () => Promise<ControllerResult>
   getUserByEmail: (email: string) => Promise<ControllerResult>
   getUserById: (id: string) => Promise<ControllerResult>
   register: (user: User) => Promise<ControllerResult>
@@ -13,6 +14,18 @@ export interface UserController {
 }
 
 export const UserController = (deps: Dependencies): UserController => {
+  const getUsers = async () => {
+    try {
+      const { success, data } = await deps.userService.getUsers()
+      if (success) {
+        return successResult(data)
+      } else {
+        return failedResult(data)
+      }
+    } catch (error) {
+      throw new Error(error)
+    }
+  }
   const getUserByEmail = async (email: string) => {
     try {
       const { success, data } = await deps.userService.getUserByEmail(email)
@@ -113,5 +126,5 @@ export const UserController = (deps: Dependencies): UserController => {
     }
   }
 
-  return { getUserByEmail, getUserById, register, updateUser, deleteUser }
+  return { getUsers, getUserByEmail, getUserById, register, updateUser, deleteUser }
 }
